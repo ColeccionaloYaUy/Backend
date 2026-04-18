@@ -1,0 +1,19 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "value": ""
+  },
+  "Auth": {
+    "Secret": "",
+    "ValidAudience": "",
+    "ValidIssuer": "",
+    "AccessTokenExpirationMinutes": 0,
+    "RefreshTokenExpirationDays": 0
+  }
+}
