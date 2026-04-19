@@ -1,11 +1,11 @@
-﻿using API.API_Clean_Architecture.Models.ProblemDetailsUtils;
-using API.Domain.Exceptions;
+﻿using ColeccionaloYa.API_Clean_Architecture.Models.ProblemDetailsUtils;
+using ColeccionaloYa.Domain.Exceptions;
 using Serilog;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Text.Json;
 
-namespace API.API_Clean_Architecture.Middlewares;
+namespace ColeccionaloYa.API_Clean_Architecture.Middlewares;
 
 public class ExceptionMiddleware {
 	private readonly RequestDelegate _Next;

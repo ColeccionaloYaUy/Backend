@@ -1,6 +1,6 @@
-using API.Persistence.Shared;
+using ColeccionaloYa.Persistence.Shared;
 
-namespace API.Application.Shared;
+namespace ColeccionaloYa.Application.Shared;
 
 public static class PagedDataExtensions {
 	public static PagedResult<TDto> ToPagedResult<TDomain, TDto>(

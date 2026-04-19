@@ -1,7 +1,7 @@
-using API.Application.Shared;
+using ColeccionaloYa.Application.Shared;
 using MediatR;
 
-namespace API.Application.Behaviors;
+namespace ColeccionaloYa.Application.Behaviors;
 
 public class PageValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IPagedQuery {

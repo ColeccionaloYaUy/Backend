@@ -1,7 +1,7 @@
-using API.API_Clean_Architecture.Filters;
+using ColeccionaloYa.API_Clean_Architecture.Filters;
 using Microsoft.OpenApi;
 
-namespace API.API_Clean_Architecture.Configurations.Builder;
+namespace ColeccionaloYa.API_Clean_Architecture.Configurations.Builder;
 
 public static class BuilderSwaggerConfig {
     public static void ConfigureSwagger(this IHostApplicationBuilder builder) {

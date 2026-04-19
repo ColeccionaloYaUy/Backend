@@ -1,4 +1,4 @@
-namespace API.Application.Shared;
+namespace ColeccionaloYa.Application.Shared;
 
 public record PagedResult<T>(
 	List<T> Items,

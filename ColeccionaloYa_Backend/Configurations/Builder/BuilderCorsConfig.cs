@@ -1,4 +1,4 @@
-﻿namespace API.API_Clean_Architecture.Configurations.Builder;
+﻿namespace ColeccionaloYa.API_Clean_Architecture.Configurations.Builder;
 
 public static class BuilderCorsConfig {
 	public static string PolicyName => ConfigurationConstants.MY_CORS;

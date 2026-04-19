@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace API.Utils.Attributes {
+namespace ColeccionaloYa.Utils.Attributes {
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
 	public class InjectableAttribute : Attribute {
 		public ServiceLifetime Lifetime { get; }

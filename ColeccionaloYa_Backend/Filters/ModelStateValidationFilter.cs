@@ -1,7 +1,7 @@
-﻿using API.Domain.Exceptions;
+﻿using ColeccionaloYa.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace API.API_Clean_Architecture.Filters;
+namespace ColeccionaloYa.API_Clean_Architecture.Filters;
 
 public class ModelStateValidationFilter : ActionFilterAttribute {
 	public override void OnActionExecuting(ActionExecutingContext context) {

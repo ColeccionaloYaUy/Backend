@@ -1,6 +1,6 @@
-﻿using API.API_Clean_Architecture.Filters;
+﻿using ColeccionaloYa.API_Clean_Architecture.Filters;
 
-namespace API.API_Clean_Architecture.Configurations.Builder;
+namespace ColeccionaloYa.API_Clean_Architecture.Configurations.Builder;
 
 public static class BuilderControllersConfig {
 	public static void ConfigureControllers(this IHostApplicationBuilder builder) {

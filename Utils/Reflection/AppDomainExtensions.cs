@@ -1,6 +1,6 @@
-﻿namespace API.Utils.Reflection {
+﻿namespace ColeccionaloYa.Utils.Reflection {
 	public static class AppDomainExtensions {
-		private const string SEARCH_PATTERN = "API.*.dll";
+		private const string SEARCH_PATTERN = "ColeccionaloYa.*.dll";
 
 		public static string[]? GetProjectAssemblies(this AppDomain appDomain) {
 			var baseDirectory = appDomain.BaseDirectory;

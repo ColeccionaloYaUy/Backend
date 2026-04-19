@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace API.API_Clean_Architecture.Controllers.Auth.Logout;
+namespace ColeccionaloYa.API_Clean_Architecture.Controllers.Auth.Logout;
 
 public class LogoutRequest {
 	[Required]

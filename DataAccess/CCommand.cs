@@ -1,8 +1,8 @@
-﻿using API.DataAccess.Interfaces;
+﻿using ColeccionaloYa.DataAccess.Interfaces;
 using Npgsql;
 using System.Data;
 
-namespace API.DataAccess;
+namespace ColeccionaloYa.DataAccess;
 
 public class CCommand : ICCommand {
     private readonly NpgsqlCommand _Command;

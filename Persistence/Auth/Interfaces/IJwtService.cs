@@ -1,4 +1,4 @@
-namespace API.Persistence.Auth.Interfaces;
+namespace ColeccionaloYa.Persistence.Auth.Interfaces;
 
 public interface IJwtService {
 	string GenerateAccessToken(int userId, string email, string roleName);

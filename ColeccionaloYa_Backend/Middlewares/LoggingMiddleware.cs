@@ -3,13 +3,13 @@ using System.IO.Compression;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
-using API.API_Clean_Architecture.Attributes;
-using API.API_Clean_Architecture.Models.Logging;
+using ColeccionaloYa.API_Clean_Architecture.Attributes;
+using ColeccionaloYa.API_Clean_Architecture.Models.Logging;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Serilog;
 
-namespace API.API_Clean_Architecture.Middlewares;
+namespace ColeccionaloYa.API_Clean_Architecture.Middlewares;
 
 public class LoggingMiddleware {
 	private const string SENSITIVE_INFORMATION = "[SENSITIVE_INFORMATION]";

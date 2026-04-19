@@ -1,11 +1,11 @@
-using API.DataAccess.Interfaces;
-using API.Domain.Auth;
-using API.Persistence.Auth.Interfaces;
-using API.Utils.Attributes;
+using ColeccionaloYa.DataAccess.Interfaces;
+using ColeccionaloYa.Domain.Auth;
+using ColeccionaloYa.Persistence.Auth.Interfaces;
+using ColeccionaloYa.Utils.Attributes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace API.Persistence.Auth.Services;
+namespace ColeccionaloYa.Persistence.Auth.Services;
 
 [Injectable(ServiceLifetime.Scoped)]
 public class AuthService : IAuthService {

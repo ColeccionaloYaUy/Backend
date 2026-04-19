@@ -1,14 +1,14 @@
 ﻿using System.Reflection;
 using System.Text.RegularExpressions;
-using API.Utils.Attributes;
-using API.Utils.Reflection;
+using ColeccionaloYa.Utils.Attributes;
+using ColeccionaloYa.Utils.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace API.Utils.DI;
+namespace ColeccionaloYa.Utils.DI;
 
 public static class ServiceCollectionExtensions {
-	private const string SEARCH_PATTERN = "^API.*";
+	private const string SEARCH_PATTERN = "^ColeccionaloYa.*";
 
 	public static void AddInjectables(this IHostApplicationBuilder builder) {
 		var assemblies = new List<Assembly>();

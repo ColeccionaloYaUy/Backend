@@ -1,4 +1,4 @@
-namespace API.Domain.Auth;
+namespace ColeccionaloYa.Domain.Auth;
 
 public class User {
 	public int Id { get; set; }

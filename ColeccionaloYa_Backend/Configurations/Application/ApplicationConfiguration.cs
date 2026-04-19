@@ -1,7 +1,8 @@
-﻿using API.API_Clean_Architecture.Middlewares;
+﻿using ColeccionaloYa.API_Clean_Architecture.Middlewares;
+using ColeccionaloYa.ColeccionaloYa_Backend.Middlewares;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
-namespace API.API_Clean_Architecture.Configurations.Application;
+namespace ColeccionaloYa.API_Clean_Architecture.Configurations.Application;
 
 public static class ApplicationConfiguration {
     public static WebApplication Configure(this WebApplication app) {
@@ -16,6 +17,8 @@ public static class ApplicationConfiguration {
         //app.UseMiddleware<SecurityHeadersMiddleware>();
 
         app.UseMiddleware<ExceptionMiddleware>();
+
+        app.UseMiddleware<IdempotencyMiddleware>();
 
         app.UseMiddleware<DbConnectionMiddleware>();
 

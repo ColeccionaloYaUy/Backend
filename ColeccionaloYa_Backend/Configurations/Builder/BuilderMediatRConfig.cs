@@ -1,8 +1,8 @@
-﻿using API.Application.Behaviors;
-using API.Utils.Reflection;
+﻿using ColeccionaloYa.Application.Behaviors;
+using ColeccionaloYa.Utils.Reflection;
 using System.Reflection;
 
-namespace API.API_Clean_Architecture.Configurations.Builder;
+namespace ColeccionaloYa.API_Clean_Architecture.Configurations.Builder;
 
 public static class BuilderMediatRConfig {
     public static void ConfigureMediatR(this IHostApplicationBuilder builder) {

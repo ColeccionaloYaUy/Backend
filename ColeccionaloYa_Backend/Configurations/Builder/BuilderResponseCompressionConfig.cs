@@ -1,7 +1,7 @@
 ﻿using System.IO.Compression;
 using Microsoft.AspNetCore.ResponseCompression;
 
-namespace API.API_Clean_Architecture.Configurations.Builder;
+namespace ColeccionaloYa.API_Clean_Architecture.Configurations.Builder;
 
 public static class BuilderResponseCompressionConfig {
     public static void ConfigureResponseCompression(this IHostApplicationBuilder builder) {

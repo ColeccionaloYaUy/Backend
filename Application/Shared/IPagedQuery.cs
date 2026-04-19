@@ -1,4 +1,4 @@
-namespace API.Application.Shared;
+namespace ColeccionaloYa.Application.Shared;
 
 public interface IPagedQuery {
 	int Page { get; }

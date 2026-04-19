@@ -1,7 +1,7 @@
-﻿using API.Persistence.Auth.Interfaces;
+﻿using ColeccionaloYa.Persistence.Auth.Interfaces;
 using MediatR;
 
-namespace API.API_Clean_Architecture.Controllers.Auth.Register;
+namespace ColeccionaloYa.API_Clean_Architecture.Controllers.Auth.Register;
 
 public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthResponseDto?> {
 	private readonly IAuthService _AuthService;

@@ -1,6 +1,6 @@
-using API.DataAccess.Interfaces;
+using ColeccionaloYa.DataAccess.Interfaces;
 
-namespace API.Persistence.Shared;
+namespace ColeccionaloYa.Persistence.Shared;
 
 public static class PaginationHelper {
 	/// <summary>

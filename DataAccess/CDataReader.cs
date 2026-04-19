@@ -1,8 +1,8 @@
-﻿using API.DataAccess.Interfaces;
+﻿using ColeccionaloYa.DataAccess.Interfaces;
 using System.Data;
 using System.Data.Common;
 
-namespace API.DataAccess;
+namespace ColeccionaloYa.DataAccess;
 
 public class CDataReader : ICDataReader {
     private readonly HashSet<string> _columnsReader;

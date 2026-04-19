@@ -1,3 +1,3 @@
-namespace API.Persistence.Shared;
+namespace ColeccionaloYa.Persistence.Shared;
 
 public record PagedData<T>(List<T> Items, int TotalCount, int EffectivePage);

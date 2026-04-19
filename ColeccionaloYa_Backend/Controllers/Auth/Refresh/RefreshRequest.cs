@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace API.API_Clean_Architecture.Controllers.Auth.Refresh;
+namespace ColeccionaloYa.API_Clean_Architecture.Controllers.Auth.Refresh;
 
 public class RefreshRequest {
 	[Required]

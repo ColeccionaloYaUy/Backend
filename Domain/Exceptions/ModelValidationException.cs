@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace API.Domain.Exceptions;
+namespace ColeccionaloYa.Domain.Exceptions;
 
 public class ModelValidationException : DomainException {
 	public ModelValidationException(IDictionary<string, string[]> errors)

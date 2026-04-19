@@ -1,13 +1,14 @@
 ﻿using System.Net;
 
-namespace API.Domain.Exceptions;
+namespace ColeccionaloYa.Domain.Exceptions;
 
-public class DomainException : Exception {
-	public DomainException(HttpStatusCode statusCode, string errorType, string message) : base(message) {
-		ErrorType = errorType;
-		StatusCode = statusCode;
-	}
+public abstract class DomainException : Exception {
+    public HttpStatusCode StatusCode { get; }
+    public string ErrorType { get; }
 
-	public HttpStatusCode StatusCode { get; }
-	public string ErrorType { get; }
+    protected DomainException(HttpStatusCode statusCode, string errorType, string message)
+        : base(message) {
+        StatusCode = statusCode;
+        ErrorType = errorType;
+    }
 }

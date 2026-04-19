@@ -1,6 +1,6 @@
 ﻿using System.Threading.RateLimiting;
 
-namespace API.API_Clean_Architecture.Configurations.Builder;
+namespace ColeccionaloYa.API_Clean_Architecture.Configurations.Builder;
 
 public static class BuilderRateLimiterConfig {
     public static void ConfigureRateLimiter(this IHostApplicationBuilder builder) {

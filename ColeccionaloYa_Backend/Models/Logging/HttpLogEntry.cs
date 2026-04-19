@@ -1,4 +1,4 @@
-﻿namespace API.API_Clean_Architecture.Models.Logging;
+﻿namespace ColeccionaloYa.API_Clean_Architecture.Models.Logging;
 
 public class HttpLogEntry {
     public Guid Id { get; set; } = Guid.NewGuid();

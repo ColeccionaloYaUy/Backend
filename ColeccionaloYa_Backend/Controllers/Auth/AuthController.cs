@@ -1,12 +1,12 @@
-using API.API_Clean_Architecture.Controllers.Auth.Login;
-using API.API_Clean_Architecture.Controllers.Auth.Logout;
-using API.API_Clean_Architecture.Controllers.Auth.Refresh;
-using API.API_Clean_Architecture.Controllers.Auth.Register;
+using ColeccionaloYa.API_Clean_Architecture.Controllers.Auth.Login;
+using ColeccionaloYa.API_Clean_Architecture.Controllers.Auth.Logout;
+using ColeccionaloYa.API_Clean_Architecture.Controllers.Auth.Refresh;
+using ColeccionaloYa.API_Clean_Architecture.Controllers.Auth.Register;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.API_Clean_Architecture.Controllers.Auth;
+namespace ColeccionaloYa.API_Clean_Architecture.Controllers.Auth;
 
 [Route("api/[controller]")]
 [ApiController]

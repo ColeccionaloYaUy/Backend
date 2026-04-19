@@ -1,6 +1,6 @@
-﻿using API.API_Clean_Architecture.Attributes;
+﻿using ColeccionaloYa.API_Clean_Architecture.Attributes;
 
-namespace API.API_Clean_Architecture.Controllers.Auth.Register;
+namespace ColeccionaloYa.API_Clean_Architecture.Controllers.Auth.Register;
 
 public class RegisterRequest {
 	public string Email { get; set; } = string.Empty;

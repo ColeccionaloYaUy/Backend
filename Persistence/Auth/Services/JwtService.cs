@@ -1,5 +1,5 @@
-using API.Persistence.Auth.Interfaces;
-using API.Utils.Attributes;
+using ColeccionaloYa.Persistence.Auth.Interfaces;
+using ColeccionaloYa.Utils.Attributes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -7,7 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace API.Persistence.Auth.Services;
+namespace ColeccionaloYa.Persistence.Auth.Services;
 
 [Injectable(ServiceLifetime.Singleton)]
 public class JwtService : IJwtService {

@@ -1,9 +1,9 @@
 ﻿using System.Net;
-using API.API_Clean_Architecture.Models.Response;
+using ColeccionaloYa.API_Clean_Architecture.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace API.API_Clean_Architecture.Filters;
+namespace ColeccionaloYa.API_Clean_Architecture.Filters;
 
 public class ResponseFilter : IAsyncActionFilter {
 	public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next) {

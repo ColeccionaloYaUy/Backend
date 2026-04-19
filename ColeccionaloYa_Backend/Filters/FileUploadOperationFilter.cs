@@ -2,7 +2,7 @@
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace API.API_Clean_Architecture.Filters {
+namespace ColeccionaloYa.API_Clean_Architecture.Filters {
 	public class FileUploadOperationFilter : IOperationFilter {
 		public void Apply(OpenApiOperation operation, OperationFilterContext context) {
 			ParameterInfo[] fileParams = context.MethodInfo.GetParameters()

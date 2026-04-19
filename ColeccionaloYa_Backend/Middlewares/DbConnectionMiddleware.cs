@@ -1,6 +1,6 @@
-using API.DataAccess.Interfaces;
+using ColeccionaloYa.DataAccess.Interfaces;
 
-namespace API.API_Clean_Architecture.Middlewares;
+namespace ColeccionaloYa.API_Clean_Architecture.Middlewares;
 
 public class DbConnectionMiddleware {
 	private readonly RequestDelegate _Next;

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Serialization;
 
-namespace API.API_Clean_Architecture.Models.ProblemDetailsUtils;
+namespace ColeccionaloYa.API_Clean_Architecture.Models.ProblemDetailsUtils;
 
 public class ApiProblemDetails : ProblemDetails {
     private readonly Dictionary<string, object?> _extensions;

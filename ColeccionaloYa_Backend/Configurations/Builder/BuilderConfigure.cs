@@ -1,6 +1,6 @@
-﻿using API.Utils.DI;
+﻿using ColeccionaloYa.Utils.DI;
 
-namespace API.API_Clean_Architecture.Configurations.Builder;
+namespace ColeccionaloYa.API_Clean_Architecture.Configurations.Builder;
 
 public static class BuilderConfigure {
     public static WebApplicationBuilder Configure(this WebApplicationBuilder builder) {

@@ -1,4 +1,4 @@
-﻿namespace API.Domain.Auth;
+﻿namespace ColeccionaloYa.Domain.Auth;
 
 public class AuthData {
 	public string Token { get; set; } = string.Empty;

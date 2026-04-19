@@ -1,4 +1,4 @@
-﻿namespace API.API_Clean_Architecture.Middlewares;
+﻿namespace ColeccionaloYa.API_Clean_Architecture.Middlewares;
 
 public class SecurityHeadersMiddleware {
     private readonly RequestDelegate _next;

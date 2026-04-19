@@ -1,6 +1,6 @@
-﻿using API.Domain.Auth;
+﻿using ColeccionaloYa.Domain.Auth;
 
-namespace API.Persistence.Auth.Interfaces;
+namespace ColeccionaloYa.Persistence.Auth.Interfaces;
 
 public interface IAuthService {
 	Task<AuthData?> LoginAsync(string email, string password);

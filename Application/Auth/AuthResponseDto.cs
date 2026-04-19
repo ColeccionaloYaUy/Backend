@@ -1,4 +1,4 @@
-﻿namespace API.API_Clean_Architecture.Controllers.Auth;
+﻿namespace ColeccionaloYa.API_Clean_Architecture.Controllers.Auth;
 
 public class AuthResponseDto {
 	public string Token { get; set; }

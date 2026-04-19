@@ -1,6 +1,6 @@
 ﻿using Serilog;
 
-namespace API.API_Clean_Architecture.Configurations.Builder;
+namespace ColeccionaloYa.API_Clean_Architecture.Configurations.Builder;
 
 public static class BuilderLoggingConfig
 {

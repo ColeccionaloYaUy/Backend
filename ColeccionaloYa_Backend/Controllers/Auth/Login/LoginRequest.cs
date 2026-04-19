@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using API.API_Clean_Architecture.Attributes;
+using ColeccionaloYa.API_Clean_Architecture.Attributes;
 
-namespace API.API_Clean_Architecture.Controllers.Auth.Login;
+namespace ColeccionaloYa.API_Clean_Architecture.Controllers.Auth.Login;
 
 public class LoginRequest {
 	[Required]

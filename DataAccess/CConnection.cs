@@ -1,11 +1,11 @@
-﻿using API.DataAccess.Interfaces;
-using API.Utils.Attributes;
+﻿using ColeccionaloYa.DataAccess.Interfaces;
+using ColeccionaloYa.Utils.Attributes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using System.Data;
 
-namespace API.DataAccess;
+namespace ColeccionaloYa.DataAccess;
 
 [Injectable(ServiceLifetime.Scoped)]
 public class CConnection : ICConnection {

@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace API.DataAccess.Interfaces;
+namespace ColeccionaloYa.DataAccess.Interfaces;
 
 public interface ICCommand {
 	public string CommandText { get; set; }

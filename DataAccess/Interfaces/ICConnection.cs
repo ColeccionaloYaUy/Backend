@@ -1,4 +1,4 @@
-﻿namespace API.DataAccess.Interfaces;
+﻿namespace ColeccionaloYa.DataAccess.Interfaces;
 
 public interface ICConnection {
 	public ICCommand CreateCommand();

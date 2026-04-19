@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.API_Clean_Architecture.Models.Response;
+namespace ColeccionaloYa.API_Clean_Architecture.Models.Response;
 
 public class Response : IActionResult {
 	private const string TEST = "TEST";
