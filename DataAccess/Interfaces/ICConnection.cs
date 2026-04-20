@@ -1,15 +1,15 @@
 namespace ColeccionaloYa.DataAccess.Interfaces;
 
 public interface ICConnection {
-	ICCommand CreateCommand();
+	public ICCommand CreateCommand();
 
-	Task Connect(CancellationToken cancellationToken = default);
+	public Task Connect(CancellationToken cancellationToken = default);
 
-	Task Disconnect();
+	public Task Disconnect();
 
-	Task BeginTransaction(CancellationToken cancellationToken = default);
+	public Task BeginTransaction(CancellationToken cancellationToken = default);
 
-	Task CommitTransaction(CancellationToken cancellationToken = default);
+	public Task CommitTransaction(CancellationToken cancellationToken = default);
 
-	Task CancelTransaction(CancellationToken cancellationToken = default);
+	public Task CancelTransaction(CancellationToken cancellationToken = default);
 }
