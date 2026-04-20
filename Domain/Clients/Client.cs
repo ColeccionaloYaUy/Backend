@@ -31,11 +31,63 @@ public class Client {
 		};
 	}
 
+	public static Client CreateByAdmin(
+		string name,
+		string lastname,
+		string email,
+		string? phone,
+		string passwordHash,
+		int roleId,
+		string roleName,
+		bool active
+	) {
+		return new Client {
+			Name = name.Trim(),
+			Lastname = lastname.Trim(),
+			Email = email.Trim(),
+			Phone = string.IsNullOrWhiteSpace(phone) ? null : phone.Trim(),
+			PasswordHash = passwordHash,
+			RoleId = roleId,
+			RoleName = roleName,
+			Active = active,
+			CreationDate = DateTime.UtcNow,
+			LogicalDelete = false,
+		};
+	}
+
 	public void AssignId(int id) {
 		Id = id;
 	}
 
 	public void ChangePasswordHash(string newHash) {
 		PasswordHash = newHash;
+	}
+
+	public void UpdateProfile(string name, string lastname, string? phone) {
+		Name = name.Trim();
+		Lastname = lastname.Trim();
+		Phone = string.IsNullOrWhiteSpace(phone) ? null : phone.Trim();
+	}
+
+	public void UpdateByAdmin(string name, string lastname, string? phone, int roleId, string roleName, bool active) {
+		Name = name.Trim();
+		Lastname = lastname.Trim();
+		Phone = string.IsNullOrWhiteSpace(phone) ? null : phone.Trim();
+		RoleId = roleId;
+		RoleName = roleName;
+		Active = active;
+	}
+
+	public void Activate() {
+		Active = true;
+	}
+
+	public void Deactivate() {
+		Active = false;
+	}
+
+	public void MarkDeleted() {
+		LogicalDelete = true;
+		Active = false;
 	}
 }

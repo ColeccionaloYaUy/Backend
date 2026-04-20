@@ -11,7 +11,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Unit> {
 	}
 
 	public async Task<Unit> Handle(RegisterCommand request, CancellationToken cancellationToken) {
-		await _AuthService.RegisterAsync(request.Email, request.Password, request.Name, request.Lastname);
+		await _AuthService.RegisterAsync(request.Email, request.Password, request.Name, request.Lastname, cancellationToken);
 		return Unit.Value;
 	}
 }

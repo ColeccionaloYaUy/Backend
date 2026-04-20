@@ -1,19 +1,19 @@
-﻿using System.Data;
+using System.Data;
 
 namespace ColeccionaloYa.DataAccess.Interfaces;
 
 public interface ICCommand {
-	public string CommandText { get; set; }
-	public void AddParameter(string name, object value, DbType? type = null);
+	string CommandText { get; set; }
+	void AddParameter(string name, object? value, DbType? type = null);
 
-	public Task ExecuteCommandQuery(Action<ICDataReader> func);
-	public Task<bool> ExecuteCommandExists();
-	public Task<bool> ExecuteCommandNonQuery();
+	Task ExecuteCommandQuery(Action<ICDataReader> func, CancellationToken cancellationToken = default);
+	Task<bool> ExecuteCommandExists(CancellationToken cancellationToken = default);
+	Task<bool> ExecuteCommandNonQuery(CancellationToken cancellationToken = default);
 
-	public Task<T> ExecuteGetValue<T>(string name);
-	public Task<T?> ExecuteSelect<T>(Action<T, ICDataReader> loadData) where T : new();
+	Task<T> ExecuteGetValue<T>(string name, CancellationToken cancellationToken = default);
+	Task<T?> ExecuteSelect<T>(Func<ICDataReader, T> map, CancellationToken cancellationToken = default) where T : class;
 
-	public Task<ICDataReader> ExecuteReaderAsync();
+	Task<ICDataReader> ExecuteReaderAsync(CancellationToken cancellationToken = default);
 
-	public Task<List<T>> ExecuteSelectList<T>(Action<T, ICDataReader> loadData) where T : new();
+	Task<List<T>> ExecuteSelectList<T>(Func<ICDataReader, T> map, CancellationToken cancellationToken = default);
 }
