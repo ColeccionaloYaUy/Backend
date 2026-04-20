@@ -1,5 +1,7 @@
 using ColeccionaloYa.DataAccess.Interfaces;
 using ColeccionaloYa.Domain.Auth;
+using ColeccionaloYa.Domain.Clients;
+using ColeccionaloYa.Domain.Clients.Exceptions;
 using ColeccionaloYa.Persistence.Auth.Interfaces;
 using ColeccionaloYa.Utils.Attributes;
 using Microsoft.Extensions.Configuration;
@@ -19,110 +21,142 @@ public class AuthService : IAuthService {
 		_RefreshTokenDays = int.Parse(configuration["Auth:RefreshTokenExpirationDays"] ?? "30");
 	}
 
-	public async Task<AuthData?> LoginAsync(string email, string password) {
-		
-
+	public async Task<AuthData> LoginAsync(string email, string password) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
-            SELECT u.id, u.email, u.password_hash, r.name AS role_name
-            FROM users u
-            INNER JOIN roles r ON r.id = u.role_id
-            WHERE u.email = @email AND u.active = TRUE";
+            SELECT c.id_client, c.email, c.password_hash, r.name AS role_name
+            FROM client c
+            INNER JOIN roles r ON r.id = c.role_id
+            WHERE c.email = @email AND c.active = TRUE AND c.logical_delete = FALSE";
 		cmd.AddParameter("email", email);
 
-		var user = await cmd.ExecuteSelect<UserRow>((obj, rs) => {
-			obj.Id = rs.GetValue<int>("id");
+		var user = await cmd.ExecuteSelect<ClientCredentialsRow>((obj, rs) => {
+			obj.Id = rs.GetValue<int>("id_client");
 			obj.Email = rs.GetValue<string>("email");
 			obj.PasswordHash = rs.GetValue<string>("password_hash");
 			obj.RoleName = rs.GetValue<string>("role_name");
 		});
 
-		if (user == null) return null;
-		if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash)) return null;
+		if (user == null) throw new InvalidCredentialsException();
+		if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash)) throw new InvalidCredentialsException();
 
 		return await CreateSession(user.Id, user.Email, user.RoleName);
 	}
 
-	public async Task<AuthData?> RegisterAsync(string email, string password, string name) {
-		
-
+	public async Task<AuthData> RegisterAsync(string email, string password, string name, string lastname) {
 		var checkCmd = _Connection.CreateCommand();
-		checkCmd.CommandText = "SELECT id FROM users WHERE email = @email";
+		checkCmd.CommandText = "SELECT id_client FROM client WHERE email = @email";
 		checkCmd.AddParameter("email", email);
-		if (await checkCmd.ExecuteCommandExists()) return null;
+		if (await checkCmd.ExecuteCommandExists()) throw new EmailAlreadyRegisteredException();
 
 		var roleCmd = _Connection.CreateCommand();
-		roleCmd.CommandText = "SELECT id FROM roles WHERE name = 'User' LIMIT 1";
-		var roleId = await roleCmd.ExecuteGetValue<int>("id");
-		if (roleId == 0) return null;
+		roleCmd.CommandText = "SELECT id, name FROM roles WHERE name = 'User' LIMIT 1";
+		var role = await roleCmd.ExecuteSelect<RoleRow>((obj, rs) => {
+			obj.Id = rs.GetValue<int>("id");
+			obj.Name = rs.GetValue<string>("name");
+		});
+		if (role == null) throw new DefaultUserRoleNotFoundException();
 
 		var hash = BCrypt.Net.BCrypt.HashPassword(password);
+		var client = Client.Register(name, lastname, email, hash, role.Id, role.Name);
+
 		var insertCmd = _Connection.CreateCommand();
 		insertCmd.CommandText = @"
-            INSERT INTO users (name, email, password_hash, role_id)
-            VALUES (@name, @email, @hash, @roleId)
-            RETURNING id";
-		insertCmd.AddParameter("name", name);
-		insertCmd.AddParameter("email", email);
-		insertCmd.AddParameter("hash", hash);
-		insertCmd.AddParameter("roleId", roleId);
-		var newId = await insertCmd.ExecuteGetValue<int>("id");
-		if (newId == 0) return null;
+            INSERT INTO client (name, lastname, email, password_hash, role_id, active, creation_date, logical_delete)
+            VALUES (@name, @lastname, @email, @hash, @roleId, @active, @creationDate, @logicalDelete)
+            RETURNING id_client";
+		insertCmd.AddParameter("name", client.Name);
+		insertCmd.AddParameter("lastname", client.Lastname);
+		insertCmd.AddParameter("email", client.Email);
+		insertCmd.AddParameter("hash", client.PasswordHash);
+		insertCmd.AddParameter("roleId", client.RoleId);
+		insertCmd.AddParameter("active", client.Active);
+		insertCmd.AddParameter("creationDate", client.CreationDate);
+		insertCmd.AddParameter("logicalDelete", client.LogicalDelete);
+		var newId = await insertCmd.ExecuteGetValue<int>("id_client");
+		client.AssignId(newId);
 
-		return await CreateSession(newId, email, "User");
+		return await CreateSession(client.Id, client.Email, client.RoleName);
 	}
 
-	public async Task<AuthData?> RefreshTokenAsync(string token, string refreshToken) {
-		
-
+	public async Task<AuthData> RefreshTokenAsync(string refreshToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
-            SELECT rt.id, u.id AS user_id, u.email, r.name AS role_name
+            SELECT rt.id, c.id_client, c.email, r.name AS role_name
             FROM refresh_tokens rt
-            INNER JOIN users u ON u.id = rt.user_id
-            INNER JOIN roles r ON r.id = u.role_id
+            INNER JOIN client c ON c.id_client = rt.id_client
+            INNER JOIN roles r ON r.id = c.role_id
             WHERE rt.token = @token
               AND rt.revoked = FALSE
               AND rt.expires_at > NOW()
-              AND u.active = TRUE";
+              AND c.active = TRUE
+              AND c.logical_delete = FALSE";
 		cmd.AddParameter("token", refreshToken);
 
 		var data = await cmd.ExecuteSelect<RefreshRow>((obj, rs) => {
 			obj.RefreshTokenId = rs.GetValue<int>("id");
-			obj.UserId = rs.GetValue<int>("user_id");
+			obj.ClientId = rs.GetValue<int>("id_client");
 			obj.Email = rs.GetValue<string>("email");
 			obj.RoleName = rs.GetValue<string>("role_name");
 		});
 
-		if (data == null) return null;
+		if (data == null) throw new InvalidRefreshTokenException();
 
 		var revokeCmd = _Connection.CreateCommand();
 		revokeCmd.CommandText = "UPDATE refresh_tokens SET revoked = TRUE WHERE id = @id";
 		revokeCmd.AddParameter("id", data.RefreshTokenId);
 		await revokeCmd.ExecuteCommandNonQuery();
 
-		return await CreateSession(data.UserId, data.Email, data.RoleName);
+		return await CreateSession(data.ClientId, data.Email, data.RoleName);
 	}
 
-	public async Task<bool> LogoutAsync(string token, string refreshToken) {
-		
-
+	public async Task LogoutAsync(string refreshToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = "UPDATE refresh_tokens SET revoked = TRUE WHERE token = @token";
 		cmd.AddParameter("token", refreshToken);
-		return await cmd.ExecuteCommandNonQuery();
+		await cmd.ExecuteCommandNonQuery();
 	}
 
-	private async Task<AuthData> CreateSession(int userId, string email, string roleName) {
-		var accessToken = _JwtService.GenerateAccessToken(userId, email, roleName);
+	public async Task ChangePasswordAsync(int clientId, string currentPassword, string newPassword) {
+		var cmd = _Connection.CreateCommand();
+		cmd.CommandText = @"
+            SELECT id_client, password_hash
+            FROM client
+            WHERE id_client = @id AND active = TRUE AND logical_delete = FALSE";
+		cmd.AddParameter("id", clientId);
+
+		var row = await cmd.ExecuteSelect<ClientCredentialsRow>((obj, rs) => {
+			obj.Id = rs.GetValue<int>("id_client");
+			obj.PasswordHash = rs.GetValue<string>("password_hash");
+		});
+
+		if (row == null) throw new ClientNotFoundException();
+		if (!BCrypt.Net.BCrypt.Verify(currentPassword, row.PasswordHash)) throw new InvalidCredentialsException();
+		if (BCrypt.Net.BCrypt.Verify(newPassword, row.PasswordHash)) throw new SamePasswordException();
+
+		var newHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+		var updateCmd = _Connection.CreateCommand();
+		updateCmd.CommandText = "UPDATE client SET password_hash = @hash WHERE id_client = @id";
+		updateCmd.AddParameter("hash", newHash);
+		updateCmd.AddParameter("id", clientId);
+		await updateCmd.ExecuteCommandNonQuery();
+
+		var revokeCmd = _Connection.CreateCommand();
+		revokeCmd.CommandText = "UPDATE refresh_tokens SET revoked = TRUE WHERE id_client = @id AND revoked = FALSE";
+		revokeCmd.AddParameter("id", clientId);
+		await revokeCmd.ExecuteCommandNonQuery();
+	}
+
+	private async Task<AuthData> CreateSession(int clientId, string email, string roleName) {
+		var accessToken = _JwtService.GenerateAccessToken(clientId, email, roleName);
 		var refreshToken = _JwtService.GenerateRefreshToken();
 		const int expiresIn = 3600;
 
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
-            INSERT INTO refresh_tokens (user_id, token, expires_at)
-            VALUES (@userId, @token, @expiresAt)";
-		cmd.AddParameter("userId", userId);
+            INSERT INTO refresh_tokens (id_client, token, expires_at)
+            VALUES (@clientId, @token, @expiresAt)";
+		cmd.AddParameter("clientId", clientId);
 		cmd.AddParameter("token", refreshToken);
 		cmd.AddParameter("expiresAt", DateTime.UtcNow.AddDays(_RefreshTokenDays));
 		await cmd.ExecuteCommandNonQuery();
@@ -134,16 +168,21 @@ public class AuthService : IAuthService {
 		};
 	}
 
-	private class UserRow {
+	private class ClientCredentialsRow {
 		public int Id { get; set; }
 		public string Email { get; set; } = string.Empty;
 		public string PasswordHash { get; set; } = string.Empty;
 		public string RoleName { get; set; } = string.Empty;
 	}
 
+	private class RoleRow {
+		public int Id { get; set; }
+		public string Name { get; set; } = string.Empty;
+	}
+
 	private class RefreshRow {
 		public int RefreshTokenId { get; set; }
-		public int UserId { get; set; }
+		public int ClientId { get; set; }
 		public string Email { get; set; } = string.Empty;
 		public string RoleName { get; set; } = string.Empty;
 	}

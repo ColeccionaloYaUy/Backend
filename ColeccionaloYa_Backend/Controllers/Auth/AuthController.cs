@@ -1,7 +1,15 @@
+using System.Security.Claims;
+using ColeccionaloYa.API_Clean_Architecture.Controllers.Auth.ChangePassword;
 using ColeccionaloYa.API_Clean_Architecture.Controllers.Auth.Login;
 using ColeccionaloYa.API_Clean_Architecture.Controllers.Auth.Logout;
 using ColeccionaloYa.API_Clean_Architecture.Controllers.Auth.Refresh;
 using ColeccionaloYa.API_Clean_Architecture.Controllers.Auth.Register;
+using ColeccionaloYa.Application.Auth;
+using ColeccionaloYa.Application.Auth.ChangePassword;
+using ColeccionaloYa.Application.Auth.Login;
+using ColeccionaloYa.Application.Auth.Logout;
+using ColeccionaloYa.Application.Auth.Refresh;
+using ColeccionaloYa.Application.Auth.Register;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,31 +26,31 @@ public class AuthController : ControllerBase {
 	}
 
 	[HttpPost("login")]
-	public async Task<AuthResponseDto> Login([FromBody] LoginRequest request) {
-		var result = await _Mediator.Send(new LoginCommand(request.Email, request.Password));
-		if (result == null) throw new UnauthorizedAccessException();
-
-		return result;
-	}
+	public Task<AuthResponseDto> Login([FromBody] LoginRequest request) =>
+		_Mediator.Send(new LoginCommand(request.Email, request.Password));
 
 	[HttpPost("register")]
-	public async Task Register([FromBody] RegisterRequest request) {
-		var result = await _Mediator.Send(new RegisterCommand(request.Email, request.Password, request.FullName));
-		if (result == null) throw new InvalidOperationException("Email already in use.");
+	public async Task<IActionResult> Register([FromBody] RegisterRequest request) {
+		await _Mediator.Send(new RegisterCommand(request.Name, request.Lastname, request.Email, request.Password));
+		return NoContent();
 	}
 
 	[HttpPost("refresh")]
-	public async Task<AuthResponseDto> RefreshToken([FromBody] RefreshRequest request) {
-		var result = await _Mediator.Send(new RefreshTokenCommand(request.Token, request.RefreshToken));
-		if (result == null) throw new UnauthorizedAccessException();
-
-		return result;
-	}
+	public Task<AuthResponseDto> RefreshToken([FromBody] RefreshRequest request) =>
+		_Mediator.Send(new RefreshTokenCommand(request.RefreshToken));
 
 	[HttpPost("logout")]
 	[Authorize]
-	public async Task Logout([FromBody] LogoutRequest request) {
-		var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-		await _Mediator.Send(new LogoutCommand(token, request.RefreshToken));
+	public async Task<IActionResult> Logout([FromBody] LogoutRequest request) {
+		await _Mediator.Send(new LogoutCommand(request.RefreshToken));
+		return NoContent();
+	}
+
+	[HttpPost("change-password")]
+	[Authorize]
+	public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request) {
+		var clientId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+		await _Mediator.Send(new ChangePasswordCommand(clientId, request.CurrentPassword, request.NewPassword));
+		return NoContent();
 	}
 }

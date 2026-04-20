@@ -1,6 +1,5 @@
-﻿using ColeccionaloYa.Domain.Auth;
 using MediatR;
 
-namespace ColeccionaloYa.API_Clean_Architecture.Controllers.Auth.Refresh;
+namespace ColeccionaloYa.Application.Auth.Refresh;
 
-public record RefreshTokenCommand(string Token, string Refresh) : IRequest<AuthResponseDto>;
+public record RefreshTokenCommand(string RefreshToken) : IRequest<AuthResponseDto>;

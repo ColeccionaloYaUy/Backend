@@ -13,6 +13,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <InternalsVisibleTo Include="ColeccionaloYa.Persistence" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\Utils\Utils.csproj" />
     </ItemGroup>
 

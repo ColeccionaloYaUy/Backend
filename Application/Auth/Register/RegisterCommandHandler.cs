@@ -1,19 +1,17 @@
-﻿using ColeccionaloYa.Persistence.Auth.Interfaces;
+using ColeccionaloYa.Persistence.Auth.Interfaces;
 using MediatR;
 
-namespace ColeccionaloYa.API_Clean_Architecture.Controllers.Auth.Register;
+namespace ColeccionaloYa.Application.Auth.Register;
 
-public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthResponseDto?> {
+public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Unit> {
 	private readonly IAuthService _AuthService;
 
 	public RegisterCommandHandler(IAuthService authService) {
 		_AuthService = authService;
 	}
 
-	public async Task<AuthResponseDto?> Handle(RegisterCommand request, CancellationToken cancellationToken) {
-		var authData = await _AuthService.RegisterAsync(request.Email, request.Password, request.Name);
-		if (authData == null) return null;
-
-		return new AuthResponseDto(authData.Token, authData.RefreshToken, authData.ExpiresIn);
+	public async Task<Unit> Handle(RegisterCommand request, CancellationToken cancellationToken) {
+		await _AuthService.RegisterAsync(request.Email, request.Password, request.Name, request.Lastname);
+		return Unit.Value;
 	}
 }
