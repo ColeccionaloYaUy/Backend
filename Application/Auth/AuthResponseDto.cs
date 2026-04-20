@@ -1,13 +1,8 @@
-﻿namespace ColeccionaloYa.API_Clean_Architecture.Controllers.Auth;
+using ColeccionaloYa.Domain.Auth;
 
-public class AuthResponseDto {
-	public string Token { get; set; }
-	public string RefreshToken { get; set; }
-	public long ExpiresIn { get; set; }
+namespace ColeccionaloYa.Application.Auth;
 
-	public AuthResponseDto(string token, string refreshToken, long expiresIn) {
-		Token = token;
-		RefreshToken = refreshToken;
-		ExpiresIn = expiresIn;
-	}
+public record AuthResponseDto(string Token, string RefreshToken, long ExpiresIn) {
+	public static AuthResponseDto From(AuthData data) =>
+		new(data.Token, data.RefreshToken, data.ExpiresIn);
 }

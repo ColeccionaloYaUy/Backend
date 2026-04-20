@@ -1,5 +1,5 @@
-﻿using MediatR;
+using MediatR;
 
-namespace ColeccionaloYa.API_Clean_Architecture.Controllers.Auth.Logout;
+namespace ColeccionaloYa.Application.Auth.Logout;
 
-public record LogoutCommand(string Token, string Refresh) : IRequest<bool>;
+public record LogoutCommand(string RefreshToken) : IRequest<Unit>;
