@@ -62,12 +62,13 @@ public class AuthService : IAuthService {
 
 		var insertCmd = _Connection.CreateCommand();
 		insertCmd.CommandText = @"
-            INSERT INTO client (name, lastname, email, password_hash, role_id, active, creation_date, logical_delete)
-            VALUES (@name, @lastname, @email, @hash, @roleId, @active, @creationDate, @logicalDelete)
+            INSERT INTO client (name, lastname, email, phone, password_hash, role_id, active, creation_date, logical_delete)
+            VALUES (@name, @lastname, @email, @phone, @hash, @roleId, @active, @creationDate, @logicalDelete)
             RETURNING id_client";
 		insertCmd.AddParameter("name", client.Name);
 		insertCmd.AddParameter("lastname", client.Lastname);
 		insertCmd.AddParameter("email", client.Email);
+		insertCmd.AddParameter("phone", client.Phone ?? string.Empty);
 		insertCmd.AddParameter("hash", client.PasswordHash);
 		insertCmd.AddParameter("roleId", client.RoleId);
 		insertCmd.AddParameter("active", client.Active);
