@@ -21,40 +21,40 @@ public class AddressesController : ControllerBase {
 	}
 
 	[HttpGet("api/clients/{clientId:int}/addresses")]
-	public Task<List<AddressDto>> GetByClient(int clientId) {
+	public Task<List<AddressDto>> GetByClient(int clientId, CancellationToken cancellationToken) {
 		var (requesterId, isAdmin) = GetRequester();
-		return _Mediator.Send(new GetAddressesByClientQuery(clientId, requesterId, isAdmin));
+		return _Mediator.Send(new GetAddressesByClientQuery(clientId, requesterId, isAdmin), cancellationToken);
 	}
 
 	[HttpGet("api/addresses/{id:int}")]
-	public Task<AddressDto> GetById(int id) {
+	public Task<AddressDto> GetById(int id, CancellationToken cancellationToken) {
 		var (requesterId, isAdmin) = GetRequester();
-		return _Mediator.Send(new GetAddressByIdQuery(id, requesterId, isAdmin));
+		return _Mediator.Send(new GetAddressByIdQuery(id, requesterId, isAdmin), cancellationToken);
 	}
 
 	[HttpPost("api/clients/{clientId:int}/addresses")]
-	public async Task<IActionResult> Create(int clientId, [FromBody] AddressRequest request) {
+	public async Task<IActionResult> Create(int clientId, [FromBody] AddressRequest request, CancellationToken cancellationToken) {
 		var (requesterId, isAdmin) = GetRequester();
 		var address = await _Mediator.Send(new CreateAddressCommand(
 			clientId, request.Street, request.Number, request.City, request.Department, request.PostalCode, request.Type,
 			requesterId, isAdmin
-		));
+		), cancellationToken);
 		return CreatedAtAction(nameof(GetById), new { id = address.Id }, address);
 	}
 
 	[HttpPut("api/addresses/{id:int}")]
-	public Task<AddressDto> Update(int id, [FromBody] AddressRequest request) {
+	public Task<AddressDto> Update(int id, [FromBody] AddressRequest request, CancellationToken cancellationToken) {
 		var (requesterId, isAdmin) = GetRequester();
 		return _Mediator.Send(new UpdateAddressCommand(
 			id, request.Street, request.Number, request.City, request.Department, request.PostalCode, request.Type,
 			requesterId, isAdmin
-		));
+		), cancellationToken);
 	}
 
 	[HttpDelete("api/addresses/{id:int}")]
-	public async Task<IActionResult> Delete(int id) {
+	public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken) {
 		var (requesterId, isAdmin) = GetRequester();
-		await _Mediator.Send(new DeleteAddressCommand(id, requesterId, isAdmin));
+		await _Mediator.Send(new DeleteAddressCommand(id, requesterId, isAdmin), cancellationToken);
 		return NoContent();
 	}
 

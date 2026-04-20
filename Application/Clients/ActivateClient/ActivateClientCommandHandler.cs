@@ -12,11 +12,11 @@ public class ActivateClientCommandHandler : IRequestHandler<ActivateClientComman
 	}
 
 	public async Task<Unit> Handle(ActivateClientCommand request, CancellationToken cancellationToken) {
-		var client = await _Repository.GetByIdAsync(request.Id)
+		var client = await _Repository.GetByIdAsync(request.Id, cancellationToken)
 			?? throw new ClientNotFoundException(request.Id);
 
 		client.Activate();
-		await _Repository.UpdateActiveAsync(client.Id, client.Active);
+		await _Repository.UpdateActiveAsync(client.Id, client.Active, cancellationToken);
 		return Unit.Value;
 	}
 }

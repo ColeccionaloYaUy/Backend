@@ -26,31 +26,31 @@ public class AuthController : ControllerBase {
 	}
 
 	[HttpPost("login")]
-	public Task<AuthResponseDto> Login([FromBody] LoginRequest request) =>
-		_Mediator.Send(new LoginCommand(request.Email, request.Password));
+	public Task<AuthResponseDto> Login([FromBody] LoginRequest request, CancellationToken cancellationToken) =>
+		_Mediator.Send(new LoginCommand(request.Email, request.Password), cancellationToken);
 
 	[HttpPost("register")]
-	public async Task<IActionResult> Register([FromBody] RegisterRequest request) {
-		await _Mediator.Send(new RegisterCommand(request.Name, request.Lastname, request.Email, request.Password));
+	public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken) {
+		await _Mediator.Send(new RegisterCommand(request.Name, request.Lastname, request.Email, request.Password), cancellationToken);
 		return NoContent();
 	}
 
 	[HttpPost("refresh")]
-	public Task<AuthResponseDto> RefreshToken([FromBody] RefreshRequest request) =>
-		_Mediator.Send(new RefreshTokenCommand(request.RefreshToken));
+	public Task<AuthResponseDto> RefreshToken([FromBody] RefreshRequest request, CancellationToken cancellationToken) =>
+		_Mediator.Send(new RefreshTokenCommand(request.RefreshToken), cancellationToken);
 
 	[HttpPost("logout")]
 	[Authorize]
-	public async Task<IActionResult> Logout([FromBody] LogoutRequest request) {
-		await _Mediator.Send(new LogoutCommand(request.RefreshToken));
+	public async Task<IActionResult> Logout([FromBody] LogoutRequest request, CancellationToken cancellationToken) {
+		await _Mediator.Send(new LogoutCommand(request.RefreshToken), cancellationToken);
 		return NoContent();
 	}
 
 	[HttpPost("change-password")]
 	[Authorize]
-	public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request) {
+	public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request, CancellationToken cancellationToken) {
 		var clientId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-		await _Mediator.Send(new ChangePasswordCommand(clientId, request.CurrentPassword, request.NewPassword));
+		await _Mediator.Send(new ChangePasswordCommand(clientId, request.CurrentPassword, request.NewPassword), cancellationToken);
 		return NoContent();
 	}
 }

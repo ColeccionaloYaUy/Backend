@@ -24,11 +24,11 @@ public class CreateClientCommandHandler : IRequestHandler<CreateClientCommand, C
 	}
 
 	public async Task<ClientDto> Handle(CreateClientCommand request, CancellationToken cancellationToken) {
-		if (await _ClientRepository.ExistsByEmailAsync(request.Email, null)) {
+		if (await _ClientRepository.ExistsByEmailAsync(request.Email, null, cancellationToken)) {
 			throw new EmailAlreadyRegisteredException();
 		}
 
-		var role = await _RoleRepository.GetByIdAsync(request.RoleId)
+		var role = await _RoleRepository.GetByIdAsync(request.RoleId, cancellationToken)
 			?? throw new RoleNotFoundException(request.RoleId);
 
 		var hash = _PasswordHasher.Hash(request.Password);
@@ -43,7 +43,7 @@ public class CreateClientCommandHandler : IRequestHandler<CreateClientCommand, C
 			request.Active
 		);
 
-		await _ClientRepository.CreateAsync(client);
+		await _ClientRepository.CreateAsync(client, cancellationToken);
 		return ClientDto.From(client);
 	}
 }

@@ -16,8 +16,8 @@ public class CDataReader : ICDataReader {
         LoadColumns();
     }
 
-    public async Task<bool> ReadAsync() {
-        var reader = await _Reader.ReadAsync();
+    public async Task<bool> ReadAsync(CancellationToken cancellationToken = default) {
+        var reader = await _Reader.ReadAsync(cancellationToken);
 
         return reader;
     }

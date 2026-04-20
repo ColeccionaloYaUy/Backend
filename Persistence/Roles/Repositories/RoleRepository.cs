@@ -20,26 +20,26 @@ public class RoleRepository : IRoleRepository {
 		obj.Description = rs.GetValue<string?>("description");
 	}
 
-	public async Task<List<Role>> GetAllAsync() {
+	public async Task<List<Role>> GetAllAsync(CancellationToken cancellationToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
             SELECT r.id, r.name, r.description
             FROM roles r
             ORDER BY r.id";
-		return await cmd.ExecuteSelectList<Role>(Map);
+		return await cmd.ExecuteSelectList<Role>(Map, cancellationToken);
 	}
 
-	public async Task<Role?> GetByIdAsync(int id) {
+	public async Task<Role?> GetByIdAsync(int id, CancellationToken cancellationToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
             SELECT r.id, r.name, r.description
             FROM roles r
             WHERE r.id = @id";
 		cmd.AddParameter("id", id);
-		return await cmd.ExecuteSelect<Role>(Map);
+		return await cmd.ExecuteSelect<Role>(Map, cancellationToken);
 	}
 
-	public async Task<bool> ExistsByNameAsync(string name, int? excludeId) {
+	public async Task<bool> ExistsByNameAsync(string name, int? excludeId, CancellationToken cancellationToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
             SELECT 1
@@ -48,20 +48,20 @@ public class RoleRepository : IRoleRepository {
               AND (@excludeId IS NULL OR r.id <> @excludeId)";
 		cmd.AddParameter("name", name);
 		cmd.AddParameter("excludeId", (object?)excludeId ?? DBNull.Value);
-		return await cmd.ExecuteCommandExists();
+		return await cmd.ExecuteCommandExists(cancellationToken);
 	}
 
-	public async Task<bool> HasAssignedClientsAsync(int id) {
+	public async Task<bool> HasAssignedClientsAsync(int id, CancellationToken cancellationToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
             SELECT 1
             FROM client c
             WHERE c.role_id = @id AND c.logical_delete = FALSE";
 		cmd.AddParameter("id", id);
-		return await cmd.ExecuteCommandExists();
+		return await cmd.ExecuteCommandExists(cancellationToken);
 	}
 
-	public async Task CreateAsync(Role role) {
+	public async Task CreateAsync(Role role, CancellationToken cancellationToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
             INSERT INTO roles (name, description)
@@ -70,11 +70,11 @@ public class RoleRepository : IRoleRepository {
 		cmd.AddParameter("name", role.Name);
 		cmd.AddParameter("description", (object?)role.Description ?? DBNull.Value);
 
-		var newId = await cmd.ExecuteGetValue<int>("id");
+		var newId = await cmd.ExecuteGetValue<int>("id", cancellationToken);
 		role.AssignId(newId);
 	}
 
-	public async Task UpdateAsync(Role role) {
+	public async Task UpdateAsync(Role role, CancellationToken cancellationToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
             UPDATE roles
@@ -85,13 +85,13 @@ public class RoleRepository : IRoleRepository {
 		cmd.AddParameter("name", role.Name);
 		cmd.AddParameter("description", (object?)role.Description ?? DBNull.Value);
 
-		await cmd.ExecuteCommandNonQuery();
+		await cmd.ExecuteCommandNonQuery(cancellationToken);
 	}
 
-	public async Task DeleteAsync(int id) {
+	public async Task DeleteAsync(int id, CancellationToken cancellationToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = "DELETE FROM roles WHERE id = @id";
 		cmd.AddParameter("id", id);
-		await cmd.ExecuteCommandNonQuery();
+		await cmd.ExecuteCommandNonQuery(cancellationToken);
 	}
 }

@@ -12,7 +12,7 @@ public class GetClientByIdQueryHandler : IRequestHandler<GetClientByIdQuery, Cli
 	}
 
 	public async Task<ClientDto> Handle(GetClientByIdQuery request, CancellationToken cancellationToken) {
-		var client = await _Repository.GetByIdAsync(request.Id)
+		var client = await _Repository.GetByIdAsync(request.Id, cancellationToken)
 			?? throw new ClientNotFoundException(request.Id);
 		return ClientDto.From(client);
 	}

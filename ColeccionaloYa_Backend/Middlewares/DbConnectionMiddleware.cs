@@ -10,7 +10,7 @@ public class DbConnectionMiddleware {
 	}
 
 	public async Task InvokeAsync(HttpContext context, ICConnection connection) {
-		await connection.Connect();
+		await connection.Connect(context.RequestAborted);
 
         try {
 			await _Next(context);

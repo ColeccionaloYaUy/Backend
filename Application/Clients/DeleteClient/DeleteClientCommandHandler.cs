@@ -12,11 +12,11 @@ public class DeleteClientCommandHandler : IRequestHandler<DeleteClientCommand, U
 	}
 
 	public async Task<Unit> Handle(DeleteClientCommand request, CancellationToken cancellationToken) {
-		var client = await _Repository.GetByIdAsync(request.Id)
+		var client = await _Repository.GetByIdAsync(request.Id, cancellationToken)
 			?? throw new ClientNotFoundException(request.Id);
 
 		client.MarkDeleted();
-		await _Repository.LogicalDeleteAsync(client.Id);
+		await _Repository.LogicalDeleteAsync(client.Id, cancellationToken);
 		return Unit.Value;
 	}
 }

@@ -20,10 +20,10 @@ public class GetAddressesByClientQueryHandler : IRequestHandler<GetAddressesByCl
 			throw new AddressAccessDeniedException();
 		}
 
-		var client = await _ClientRepository.GetByIdAsync(request.ClientId)
+		var client = await _ClientRepository.GetByIdAsync(request.ClientId, cancellationToken)
 			?? throw new ClientNotFoundException(request.ClientId);
 
-		var addresses = await _AddressRepository.GetByClientIdAsync(client.Id);
+		var addresses = await _AddressRepository.GetByClientIdAsync(client.Id, cancellationToken);
 		return addresses.Select(AddressDto.From).ToList();
 	}
 }

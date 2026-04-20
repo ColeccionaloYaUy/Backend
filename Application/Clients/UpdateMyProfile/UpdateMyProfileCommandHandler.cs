@@ -12,11 +12,11 @@ public class UpdateMyProfileCommandHandler : IRequestHandler<UpdateMyProfileComm
 	}
 
 	public async Task<ClientDto> Handle(UpdateMyProfileCommand request, CancellationToken cancellationToken) {
-		var client = await _Repository.GetByIdAsync(request.ClientId)
+		var client = await _Repository.GetByIdAsync(request.ClientId, cancellationToken)
 			?? throw new ClientNotFoundException(request.ClientId);
 
 		client.UpdateProfile(request.Name, request.Lastname, request.Phone);
-		await _Repository.UpdateProfileAsync(client);
+		await _Repository.UpdateProfileAsync(client, cancellationToken);
 		return ClientDto.From(client);
 	}
 }

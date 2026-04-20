@@ -12,7 +12,7 @@ public class GetAddressByIdQueryHandler : IRequestHandler<GetAddressByIdQuery, A
 	}
 
 	public async Task<AddressDto> Handle(GetAddressByIdQuery request, CancellationToken cancellationToken) {
-		var address = await _Repository.GetByIdAsync(request.Id)
+		var address = await _Repository.GetByIdAsync(request.Id, cancellationToken)
 			?? throw new AddressNotFoundException(request.Id);
 
 		if (!request.IsAdmin && address.ClientId != request.RequesterId) {

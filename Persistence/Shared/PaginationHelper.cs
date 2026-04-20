@@ -13,18 +13,20 @@ public static class PaginationHelper {
 	/// <param name="map">Row mapper: receives a new T instance and the current reader row.</param>
 	/// <param name="page">Requested page (1-based).</param>
 	/// <param name="pageSize">Page size.</param>
+	/// <param name="cancellationToken">Token to cancel the query.</param>
 	public static async Task<PagedData<T>> FetchPagedAsync<T>(
 		ICConnection connection,
 		string sql,
 		Action<ICCommand>? applyParams,
 		Action<T, ICDataReader> map,
 		int page,
-		int pageSize
+		int pageSize,
+		CancellationToken cancellationToken = default
 	) where T : new() {
-		var (items, totalCount) = await RunPage<T>(connection, sql, applyParams, map, page, pageSize);
+		var (items, totalCount) = await RunPage<T>(connection, sql, applyParams, map, page, pageSize, cancellationToken);
 
 		if (items.Count == 0 && page > 1) {
-			(items, totalCount) = await RunPage<T>(connection, sql, applyParams, map, 1, pageSize);
+			(items, totalCount) = await RunPage<T>(connection, sql, applyParams, map, 1, pageSize, cancellationToken);
 			return new PagedData<T>(items, totalCount, 1);
 		}
 
@@ -37,7 +39,8 @@ public static class PaginationHelper {
 		Action<ICCommand>? applyParams,
 		Action<T, ICDataReader> map,
 		int page,
-		int pageSize
+		int pageSize,
+		CancellationToken cancellationToken
 	) where T : new() {
 		var cmd = connection.CreateCommand();
 		cmd.CommandText = sql + " LIMIT @pageSize OFFSET @offset";
@@ -53,7 +56,7 @@ public static class PaginationHelper {
 			var item = new T();
 			map(item, rs);
 			items.Add(item);
-		});
+		}, cancellationToken);
 
 		return (items, totalCount);
 	}

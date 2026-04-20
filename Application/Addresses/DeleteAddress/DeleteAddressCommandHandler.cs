@@ -12,7 +12,7 @@ public class DeleteAddressCommandHandler : IRequestHandler<DeleteAddressCommand,
 	}
 
 	public async Task<Unit> Handle(DeleteAddressCommand request, CancellationToken cancellationToken) {
-		var address = await _Repository.GetByIdAsync(request.Id)
+		var address = await _Repository.GetByIdAsync(request.Id, cancellationToken)
 			?? throw new AddressNotFoundException(request.Id);
 
 		if (!request.IsAdmin && address.ClientId != request.RequesterId) {
@@ -20,7 +20,7 @@ public class DeleteAddressCommandHandler : IRequestHandler<DeleteAddressCommand,
 		}
 
 		address.MarkDeleted();
-		await _Repository.LogicalDeleteAsync(address.Id);
+		await _Repository.LogicalDeleteAsync(address.Id, cancellationToken);
 		return Unit.Value;
 	}
 }

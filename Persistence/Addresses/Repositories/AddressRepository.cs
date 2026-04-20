@@ -26,7 +26,7 @@ public class AddressRepository : IAddressRepository {
 		obj.LogicalDelete = rs.GetValue<bool>("logical_delete");
 	}
 
-	public async Task<List<Address>> GetByClientIdAsync(int clientId) {
+	public async Task<List<Address>> GetByClientIdAsync(int clientId, CancellationToken cancellationToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
             SELECT a.id_address, a.id_client, a.street, a.number, a.city, a.department,
@@ -35,10 +35,10 @@ public class AddressRepository : IAddressRepository {
             WHERE a.id_client = @clientId AND a.logical_delete = FALSE
             ORDER BY a.id_address";
 		cmd.AddParameter("clientId", clientId);
-		return await cmd.ExecuteSelectList<Address>(Map);
+		return await cmd.ExecuteSelectList<Address>(Map, cancellationToken);
 	}
 
-	public async Task<Address?> GetByIdAsync(int id) {
+	public async Task<Address?> GetByIdAsync(int id, CancellationToken cancellationToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
             SELECT a.id_address, a.id_client, a.street, a.number, a.city, a.department,
@@ -46,10 +46,10 @@ public class AddressRepository : IAddressRepository {
             FROM address a
             WHERE a.id_address = @id AND a.logical_delete = FALSE";
 		cmd.AddParameter("id", id);
-		return await cmd.ExecuteSelect<Address>(Map);
+		return await cmd.ExecuteSelect<Address>(Map, cancellationToken);
 	}
 
-	public async Task CreateAsync(Address address) {
+	public async Task CreateAsync(Address address, CancellationToken cancellationToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
             INSERT INTO address (id_client, street, number, city, department, postal_code, type, logical_delete)
@@ -64,11 +64,11 @@ public class AddressRepository : IAddressRepository {
 		cmd.AddParameter("type", address.Type.ToString().ToLower());
 		cmd.AddParameter("logicalDelete", address.LogicalDelete);
 
-		var newId = await cmd.ExecuteGetValue<int>("id_address");
+		var newId = await cmd.ExecuteGetValue<int>("id_address", cancellationToken);
 		address.AssignId(newId);
 	}
 
-	public async Task UpdateAsync(Address address) {
+	public async Task UpdateAsync(Address address, CancellationToken cancellationToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
             UPDATE address
@@ -87,16 +87,16 @@ public class AddressRepository : IAddressRepository {
 		cmd.AddParameter("postalCode", address.PostalCode);
 		cmd.AddParameter("type", address.Type.ToString().ToLower());
 
-		await cmd.ExecuteCommandNonQuery();
+		await cmd.ExecuteCommandNonQuery(cancellationToken);
 	}
 
-	public async Task LogicalDeleteAsync(int id) {
+	public async Task LogicalDeleteAsync(int id, CancellationToken cancellationToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
             UPDATE address
             SET logical_delete = TRUE
             WHERE id_address = @id AND logical_delete = FALSE";
 		cmd.AddParameter("id", id);
-		await cmd.ExecuteCommandNonQuery();
+		await cmd.ExecuteCommandNonQuery(cancellationToken);
 	}
 }

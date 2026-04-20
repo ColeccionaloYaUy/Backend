@@ -1,4 +1,4 @@
-﻿using ColeccionaloYa.DataAccess.Interfaces;
+using ColeccionaloYa.DataAccess.Interfaces;
 using Npgsql;
 using System.Data;
 
@@ -32,38 +32,38 @@ public class CCommand : ICCommand {
         _Command.Parameters.Add(param);
     }
 
-    public async Task<ICDataReader> ExecuteReaderAsync() {
-        return new CDataReader(await _Command.ExecuteReaderAsync());
+    public async Task<ICDataReader> ExecuteReaderAsync(CancellationToken cancellationToken = default) {
+        return new CDataReader(await _Command.ExecuteReaderAsync(cancellationToken));
     }
 
-    public async Task ExecuteCommandQuery(Action<ICDataReader> func) {
-        var rs = await ExecuteReaderAsync();
+    public async Task ExecuteCommandQuery(Action<ICDataReader> func, CancellationToken cancellationToken = default) {
+        var rs = await ExecuteReaderAsync(cancellationToken);
 
-        while (await rs.ReadAsync()) {
+        while (await rs.ReadAsync(cancellationToken)) {
             func(rs);
         }
 
         await rs.CloseAsync();
     }
 
-    public async Task<bool> ExecuteCommandExists() {
-        var rs = await ExecuteReaderAsync();
-        var exists = await rs.ReadAsync();
+    public async Task<bool> ExecuteCommandExists(CancellationToken cancellationToken = default) {
+        var rs = await ExecuteReaderAsync(cancellationToken);
+        var exists = await rs.ReadAsync(cancellationToken);
         await rs.CloseAsync();
         return exists;
     }
 
-    public async Task<bool> ExecuteCommandNonQuery() {
-        return await _Command.ExecuteNonQueryAsync() > 0;
+    public async Task<bool> ExecuteCommandNonQuery(CancellationToken cancellationToken = default) {
+        return await _Command.ExecuteNonQueryAsync(cancellationToken) > 0;
     }
 
-    public async Task<T> ExecuteGetValue<T>(string name) {
+    public async Task<T> ExecuteGetValue<T>(string name, CancellationToken cancellationToken = default) {
         var result = default(T);
 
         try {
-            var rs = await ExecuteReaderAsync();
+            var rs = await ExecuteReaderAsync(cancellationToken);
 
-            if (await rs.ReadAsync()) {
+            if (await rs.ReadAsync(cancellationToken)) {
                 result = rs.GetValue<T>(name);
             }
 
@@ -74,12 +74,12 @@ public class CCommand : ICCommand {
         return result;
     }
 
-    public async Task<T?> ExecuteSelect<T>(Action<T, ICDataReader> loadData) where T : new() {
+    public async Task<T?> ExecuteSelect<T>(Action<T, ICDataReader> loadData, CancellationToken cancellationToken = default) where T : new() {
         var result = default(T?);
 
-        var rs = await ExecuteReaderAsync();
+        var rs = await ExecuteReaderAsync(cancellationToken);
 
-        if (await rs.ReadAsync()) {
+        if (await rs.ReadAsync(cancellationToken)) {
             result = new T();
             loadData.Invoke(result, rs);
         }
@@ -89,12 +89,12 @@ public class CCommand : ICCommand {
         return result;
     }
 
-    public async Task<List<T>> ExecuteSelectList<T>(Action<T, ICDataReader> loadData) where T : new() {
+    public async Task<List<T>> ExecuteSelectList<T>(Action<T, ICDataReader> loadData, CancellationToken cancellationToken = default) where T : new() {
         var result = new List<T>();
 
-        var rs = await ExecuteReaderAsync();
+        var rs = await ExecuteReaderAsync(cancellationToken);
 
-        while (await rs.ReadAsync()) {
+        while (await rs.ReadAsync(cancellationToken)) {
             T obj = new();
             loadData.Invoke(obj, rs);
 

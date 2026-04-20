@@ -1,4 +1,4 @@
-﻿using ColeccionaloYa.DataAccess.Interfaces;
+using ColeccionaloYa.DataAccess.Interfaces;
 using ColeccionaloYa.Domain.Idempotency;
 using ColeccionaloYa.Persistence.Idempotency.Interfaces;
 using ColeccionaloYa.Utils.Attributes;
@@ -26,9 +26,9 @@ namespace ColeccionaloYa.Persistence.Idempotency.Repository {
         }
 
         public async Task<IdempotencyKey?> TryInsertAsync(
-            string key, int? clientId, string endpoint, string requestHash) {
+            string key, int? clientId, string endpoint, string requestHash, CancellationToken cancellationToken) {
             // Primero intentamos leer si ya existe (no expirada)
-            var existing = await GetExistingAsync(key, clientId);
+            var existing = await GetExistingAsync(key, clientId, cancellationToken);
             if (existing != null)
                 return existing;
 
@@ -50,10 +50,10 @@ namespace ColeccionaloYa.Persistence.Idempotency.Repository {
             // Si ON CONFLICT DO NOTHING disparó, RETURNING devuelve 0 filas.
             // Eso significa que entre nuestra lectura y el insert alguien más insertó.
             // Releemos.
-            var inserted = await cmd.ExecuteSelect<IdempotencyKey>(Map);
+            var inserted = await cmd.ExecuteSelect<IdempotencyKey>(Map, cancellationToken);
             if (inserted is null) {
                 // Race condition: otro hilo insertó primero. Devolvemos el existente.
-                return await GetExistingAsync(key, clientId);
+                return await GetExistingAsync(key, clientId, cancellationToken);
             }
 
             // Insertado exitosamente como 'processing' → devolvemos null para indicar
@@ -61,7 +61,7 @@ namespace ColeccionaloYa.Persistence.Idempotency.Repository {
             return null;
         }
 
-        private async Task<IdempotencyKey?> GetExistingAsync(string key, int? clientId) {
+        private async Task<IdempotencyKey?> GetExistingAsync(string key, int? clientId, CancellationToken cancellationToken) {
             var cmd = _connection.CreateCommand();
             cmd.CommandText = @"
             SELECT id, idempotency_key, id_client, endpoint, request_hash,
@@ -72,10 +72,10 @@ namespace ColeccionaloYa.Persistence.Idempotency.Repository {
               AND expires_at > NOW()";
             cmd.AddParameter("key", key);
             cmd.AddParameter("clientId", (object?)clientId ?? DBNull.Value);
-            return await cmd.ExecuteSelect<IdempotencyKey>(Map);
+            return await cmd.ExecuteSelect<IdempotencyKey>(Map, cancellationToken);
         }
 
-        public async Task CompleteAsync(string key, int? clientId, int statusCode, string responseBody) {
+        public async Task CompleteAsync(string key, int? clientId, int statusCode, string responseBody, CancellationToken cancellationToken) {
             var cmd = _connection.CreateCommand();
             cmd.CommandText = @"
             UPDATE idempotency_keys
@@ -88,10 +88,10 @@ namespace ColeccionaloYa.Persistence.Idempotency.Repository {
             cmd.AddParameter("clientId", (object?)clientId ?? DBNull.Value);
             cmd.AddParameter("statusCode", (short)statusCode);
             cmd.AddParameter("body", responseBody);
-            await cmd.ExecuteCommandNonQuery();
+            await cmd.ExecuteCommandNonQuery(cancellationToken);
         }
 
-        public async Task FailAsync(string key, int? clientId) {
+        public async Task FailAsync(string key, int? clientId, CancellationToken cancellationToken) {
             var cmd = _connection.CreateCommand();
             cmd.CommandText = @"
             UPDATE idempotency_keys
@@ -100,7 +100,7 @@ namespace ColeccionaloYa.Persistence.Idempotency.Repository {
               AND (id_client = @clientId OR (id_client IS NULL AND @clientId IS NULL))";
             cmd.AddParameter("key", key);
             cmd.AddParameter("clientId", (object?)clientId ?? DBNull.Value);
-            await cmd.ExecuteCommandNonQuery();
+            await cmd.ExecuteCommandNonQuery(cancellationToken);
         }
     }
 }

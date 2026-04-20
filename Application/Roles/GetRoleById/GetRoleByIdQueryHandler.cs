@@ -12,7 +12,7 @@ public class GetRoleByIdQueryHandler : IRequestHandler<GetRoleByIdQuery, RoleDto
 	}
 
 	public async Task<RoleDto> Handle(GetRoleByIdQuery request, CancellationToken cancellationToken) {
-		var role = await _Repository.GetByIdAsync(request.Id)
+		var role = await _Repository.GetByIdAsync(request.Id, cancellationToken)
 			?? throw new RoleNotFoundException(request.Id);
 		return RoleDto.From(role);
 	}

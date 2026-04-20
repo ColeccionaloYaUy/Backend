@@ -31,7 +31,7 @@ public class ClientRepository : IClientRepository {
 		obj.LogicalDelete = rs.GetValue<bool>("logical_delete");
 	}
 
-	public async Task<PagedData<Client>> GetPagedAsync(int page, int pageSize, string? search, int? roleId, bool? active) {
+	public async Task<PagedData<Client>> GetPagedAsync(int page, int pageSize, string? search, int? roleId, bool? active, CancellationToken cancellationToken) {
 		var sql = @"
             SELECT COUNT(*) OVER() AS total_count,
                    c.id_client, c.name, c.lastname, c.email, c.phone, c.password_hash,
@@ -57,11 +57,12 @@ public class ClientRepository : IClientRepository {
 			},
 			Map,
 			page,
-			pageSize
+			pageSize,
+			cancellationToken
 		);
 	}
 
-	public async Task<Client?> GetByIdAsync(int id) {
+	public async Task<Client?> GetByIdAsync(int id, CancellationToken cancellationToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
             SELECT c.id_client, c.name, c.lastname, c.email, c.phone, c.password_hash,
@@ -72,10 +73,10 @@ public class ClientRepository : IClientRepository {
             INNER JOIN roles r ON r.id = c.role_id
             WHERE c.id_client = @id AND c.logical_delete = FALSE";
 		cmd.AddParameter("id", id);
-		return await cmd.ExecuteSelect<Client>(Map);
+		return await cmd.ExecuteSelect<Client>(Map, cancellationToken);
 	}
 
-	public async Task<bool> ExistsByEmailAsync(string email, int? excludeId) {
+	public async Task<bool> ExistsByEmailAsync(string email, int? excludeId, CancellationToken cancellationToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
             SELECT 1
@@ -85,10 +86,10 @@ public class ClientRepository : IClientRepository {
               AND (@excludeId IS NULL OR c.id_client <> @excludeId)";
 		cmd.AddParameter("email", email);
 		cmd.AddParameter("excludeId", (object?)excludeId ?? DBNull.Value);
-		return await cmd.ExecuteCommandExists();
+		return await cmd.ExecuteCommandExists(cancellationToken);
 	}
 
-	public async Task CreateAsync(Client client) {
+	public async Task CreateAsync(Client client, CancellationToken cancellationToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
             INSERT INTO client (name, lastname, email, phone, password_hash, role_id, active, creation_date, logical_delete)
@@ -104,11 +105,11 @@ public class ClientRepository : IClientRepository {
 		cmd.AddParameter("creationDate", client.CreationDate);
 		cmd.AddParameter("logicalDelete", client.LogicalDelete);
 
-		var newId = await cmd.ExecuteGetValue<int>("id_client");
+		var newId = await cmd.ExecuteGetValue<int>("id_client", cancellationToken);
 		client.AssignId(newId);
 	}
 
-	public async Task UpdateProfileAsync(Client client) {
+	public async Task UpdateProfileAsync(Client client, CancellationToken cancellationToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
             UPDATE client
@@ -120,10 +121,10 @@ public class ClientRepository : IClientRepository {
 		cmd.AddParameter("name", client.Name);
 		cmd.AddParameter("lastname", client.Lastname);
 		cmd.AddParameter("phone", (object?)client.Phone ?? DBNull.Value);
-		await cmd.ExecuteCommandNonQuery();
+		await cmd.ExecuteCommandNonQuery(cancellationToken);
 	}
 
-	public async Task UpdateByAdminAsync(Client client) {
+	public async Task UpdateByAdminAsync(Client client, CancellationToken cancellationToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
             UPDATE client
@@ -139,10 +140,10 @@ public class ClientRepository : IClientRepository {
 		cmd.AddParameter("phone", (object?)client.Phone ?? DBNull.Value);
 		cmd.AddParameter("roleId", client.RoleId);
 		cmd.AddParameter("active", client.Active);
-		await cmd.ExecuteCommandNonQuery();
+		await cmd.ExecuteCommandNonQuery(cancellationToken);
 	}
 
-	public async Task UpdateActiveAsync(int id, bool active) {
+	public async Task UpdateActiveAsync(int id, bool active, CancellationToken cancellationToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
             UPDATE client
@@ -150,10 +151,10 @@ public class ClientRepository : IClientRepository {
             WHERE id_client = @id AND logical_delete = FALSE";
 		cmd.AddParameter("id", id);
 		cmd.AddParameter("active", active);
-		await cmd.ExecuteCommandNonQuery();
+		await cmd.ExecuteCommandNonQuery(cancellationToken);
 	}
 
-	public async Task LogicalDeleteAsync(int id) {
+	public async Task LogicalDeleteAsync(int id, CancellationToken cancellationToken) {
 		var cmd = _Connection.CreateCommand();
 		cmd.CommandText = @"
             UPDATE client
@@ -161,6 +162,6 @@ public class ClientRepository : IClientRepository {
                 active = FALSE
             WHERE id_client = @id AND logical_delete = FALSE";
 		cmd.AddParameter("id", id);
-		await cmd.ExecuteCommandNonQuery();
+		await cmd.ExecuteCommandNonQuery(cancellationToken);
 	}
 }

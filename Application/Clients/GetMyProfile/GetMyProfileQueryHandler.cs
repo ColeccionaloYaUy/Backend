@@ -12,7 +12,7 @@ public class GetMyProfileQueryHandler : IRequestHandler<GetMyProfileQuery, Clien
 	}
 
 	public async Task<ClientDto> Handle(GetMyProfileQuery request, CancellationToken cancellationToken) {
-		var client = await _Repository.GetByIdAsync(request.ClientId)
+		var client = await _Repository.GetByIdAsync(request.ClientId, cancellationToken)
 			?? throw new ClientNotFoundException(request.ClientId);
 		return ClientDto.From(client);
 	}

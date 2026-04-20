@@ -12,7 +12,7 @@ public class GetClientsQueryHandler : IRequestHandler<GetClientsQuery, PagedResu
 	}
 
 	public async Task<PagedResult<ClientDto>> Handle(GetClientsQuery request, CancellationToken cancellationToken) {
-		var data = await _Repository.GetPagedAsync(request.Page, request.PageSize, request.Search, request.RoleId, request.Active);
+		var data = await _Repository.GetPagedAsync(request.Page, request.PageSize, request.Search, request.RoleId, request.Active, cancellationToken);
 		return data.ToPagedResult(request.PageSize, ClientDto.From);
 	}
 }

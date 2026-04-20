@@ -21,26 +21,26 @@ public class RolesController : ControllerBase {
 	}
 
 	[HttpGet]
-	public Task<List<RoleDto>> GetAll() =>
-		_Mediator.Send(new GetRolesQuery());
+	public Task<List<RoleDto>> GetAll(CancellationToken cancellationToken) =>
+		_Mediator.Send(new GetRolesQuery(), cancellationToken);
 
 	[HttpGet("{id:int}")]
-	public Task<RoleDto> GetById(int id) =>
-		_Mediator.Send(new GetRoleByIdQuery(id));
+	public Task<RoleDto> GetById(int id, CancellationToken cancellationToken) =>
+		_Mediator.Send(new GetRoleByIdQuery(id), cancellationToken);
 
 	[HttpPost]
-	public async Task<IActionResult> Create([FromBody] RoleRequest request) {
-		var role = await _Mediator.Send(new CreateRoleCommand(request.Name, request.Description));
+	public async Task<IActionResult> Create([FromBody] RoleRequest request, CancellationToken cancellationToken) {
+		var role = await _Mediator.Send(new CreateRoleCommand(request.Name, request.Description), cancellationToken);
 		return CreatedAtAction(nameof(GetById), new { id = role.Id }, role);
 	}
 
 	[HttpPut("{id:int}")]
-	public Task<RoleDto> Update(int id, [FromBody] RoleRequest request) =>
-		_Mediator.Send(new UpdateRoleCommand(id, request.Name, request.Description));
+	public Task<RoleDto> Update(int id, [FromBody] RoleRequest request, CancellationToken cancellationToken) =>
+		_Mediator.Send(new UpdateRoleCommand(id, request.Name, request.Description), cancellationToken);
 
 	[HttpDelete("{id:int}")]
-	public async Task<IActionResult> Delete(int id) {
-		await _Mediator.Send(new DeleteRoleCommand(id));
+	public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken) {
+		await _Mediator.Send(new DeleteRoleCommand(id), cancellationToken);
 		return NoContent();
 	}
 }

@@ -21,7 +21,7 @@ public class CreateAddressCommandHandler : IRequestHandler<CreateAddressCommand,
 			throw new AddressAccessDeniedException();
 		}
 
-		var client = await _ClientRepository.GetByIdAsync(request.ClientId)
+		var client = await _ClientRepository.GetByIdAsync(request.ClientId, cancellationToken)
 			?? throw new ClientNotFoundException(request.ClientId);
 
 		var address = Address.Create(
@@ -34,7 +34,7 @@ public class CreateAddressCommandHandler : IRequestHandler<CreateAddressCommand,
 			request.Type
 		);
 
-		await _AddressRepository.CreateAsync(address);
+		await _AddressRepository.CreateAsync(address, cancellationToken);
 		return AddressDto.From(address);
 	}
 }

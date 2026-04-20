@@ -1,4 +1,4 @@
-﻿using ColeccionaloYa.DataAccess.Interfaces;
+using ColeccionaloYa.DataAccess.Interfaces;
 using ColeccionaloYa.Utils.Attributes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,14 +26,15 @@ public class CConnection : ICConnection {
     internal NpgsqlConnection? ConnectionDB { get; set; }
     internal NpgsqlTransaction? Transaction { get; set; }
 
-    public async Task Connect() {
+    public async Task Connect(CancellationToken cancellationToken = default) {
         if (ConnectionDB == null) {
             throw new NullReferenceException("No Connection assigned");
         }
 
         if (ConnectionDB.State == ConnectionState.Closed) {
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-            await ConnectionDB.OpenAsync(cts.Token);
+            using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
+            await ConnectionDB.OpenAsync(linkedCts.Token);
         }
     }
 
@@ -47,20 +48,20 @@ public class CConnection : ICConnection {
         }
     }
 
-    public async Task BeginTransaction() {
-        Transaction = await ConnectionDB!.BeginTransactionAsync();
+    public async Task BeginTransaction(CancellationToken cancellationToken = default) {
+        Transaction = await ConnectionDB!.BeginTransactionAsync(cancellationToken);
     }
 
-    public async Task CommitTransaction() {
+    public async Task CommitTransaction(CancellationToken cancellationToken = default) {
         if (Transaction != null) {
-            await Transaction.CommitAsync();
+            await Transaction.CommitAsync(cancellationToken);
             Transaction = null;
         }
     }
 
-    public async Task CancelTransaction() {
+    public async Task CancelTransaction(CancellationToken cancellationToken = default) {
         if (Transaction != null) {
-            await Transaction.RollbackAsync();
+            await Transaction.RollbackAsync(cancellationToken);
             Transaction = null;
         }
     }

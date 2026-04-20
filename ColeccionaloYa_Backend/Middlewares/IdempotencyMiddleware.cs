@@ -84,11 +84,12 @@ namespace ColeccionaloYa.ColeccionaloYa_Backend.Middlewares {
             var bodyBytes = await ReadBodyAsync(context.Request);
             var requestHash = ComputeSha256(bodyBytes);
             var endpoint2 = $"{context.Request.Method} {context.Request.Path}";
+            var cancellationToken = context.RequestAborted;
 
             // Intentar insertar/consultar la key
             IdempotencyKey? existing;
             try {
-                existing = await repo.TryInsertAsync(idempotencyKey, clientId, endpoint2, requestHash);
+                existing = await repo.TryInsertAsync(idempotencyKey, clientId, endpoint2, requestHash, cancellationToken);
             } catch {
                 // Si falla la BD en este punto, dejamos pasar sin idempotencia
                 // (degradación controlada: mejor ejecutar que bloquear todo)
@@ -109,7 +110,7 @@ namespace ColeccionaloYa.ColeccionaloYa_Backend.Middlewares {
 
                 case "failed":
                     // Permitir reintento: borrar la vieja y procesar de nuevo
-                    await repo.FailAsync(idempotencyKey, clientId); // ya está en failed, re-insert en siguiente request
+                    await repo.FailAsync(idempotencyKey, clientId, cancellationToken); // ya está en failed, re-insert en siguiente request
                                                                     // En este caso simplemente procesamos (la key está en 'failed', no bloquea)
                     await ProcessAndSaveAsync(context, repo, idempotencyKey, clientId, bodyBytes);
                     return;
@@ -137,6 +138,8 @@ namespace ColeccionaloYa.ColeccionaloYa_Backend.Middlewares {
             string key,
             int? clientId,
             byte[] bodyBytes) {
+            var cancellationToken = context.RequestAborted;
+
             // Resetear el body para que el controller pueda leerlo
             context.Request.Body.Position = 0;
 
@@ -160,10 +163,14 @@ namespace ColeccionaloYa.ColeccionaloYa_Backend.Middlewares {
             captureStream.Seek(0, SeekOrigin.Begin);
             var responseBody = Encoding.UTF8.GetString(captureStream.ToArray());
 
+            // Tras finalizar la pipeline del request, el CancellationToken del
+            // request puede estar ya cancelado (especialmente en 5xx). Persistir
+            // el resultado de idempotencia es crítico para no bloquear retries:
+            // usamos CancellationToken.None para asegurar el write.
             if (succeeded && context.Response.StatusCode < 500) {
-                await repo.CompleteAsync(key, clientId, context.Response.StatusCode, responseBody);
+                await repo.CompleteAsync(key, clientId, context.Response.StatusCode, responseBody, CancellationToken.None);
             } else {
-                await repo.FailAsync(key, clientId);
+                await repo.FailAsync(key, clientId, CancellationToken.None);
             }
         }
 

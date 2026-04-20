@@ -13,12 +13,12 @@ public class CreateRoleCommandHandler : IRequestHandler<CreateRoleCommand, RoleD
 	}
 
 	public async Task<RoleDto> Handle(CreateRoleCommand request, CancellationToken cancellationToken) {
-		if (await _Repository.ExistsByNameAsync(request.Name, null)) {
+		if (await _Repository.ExistsByNameAsync(request.Name, null, cancellationToken)) {
 			throw new DuplicateRoleNameException(request.Name);
 		}
 
 		var role = Role.Create(request.Name, request.Description);
-		await _Repository.CreateAsync(role);
+		await _Repository.CreateAsync(role, cancellationToken);
 		return RoleDto.From(role);
 	}
 }

@@ -12,11 +12,11 @@ public class DeactivateClientCommandHandler : IRequestHandler<DeactivateClientCo
 	}
 
 	public async Task<Unit> Handle(DeactivateClientCommand request, CancellationToken cancellationToken) {
-		var client = await _Repository.GetByIdAsync(request.Id)
+		var client = await _Repository.GetByIdAsync(request.Id, cancellationToken)
 			?? throw new ClientNotFoundException(request.Id);
 
 		client.Deactivate();
-		await _Repository.UpdateActiveAsync(client.Id, client.Active);
+		await _Repository.UpdateActiveAsync(client.Id, client.Active, cancellationToken);
 		return Unit.Value;
 	}
 }

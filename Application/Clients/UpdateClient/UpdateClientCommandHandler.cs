@@ -16,14 +16,14 @@ public class UpdateClientCommandHandler : IRequestHandler<UpdateClientCommand, C
 	}
 
 	public async Task<ClientDto> Handle(UpdateClientCommand request, CancellationToken cancellationToken) {
-		var client = await _ClientRepository.GetByIdAsync(request.Id)
+		var client = await _ClientRepository.GetByIdAsync(request.Id, cancellationToken)
 			?? throw new ClientNotFoundException(request.Id);
 
-		var role = await _RoleRepository.GetByIdAsync(request.RoleId)
+		var role = await _RoleRepository.GetByIdAsync(request.RoleId, cancellationToken)
 			?? throw new RoleNotFoundException(request.RoleId);
 
 		client.UpdateByAdmin(request.Name, request.Lastname, request.Phone, role.Id, role.Name, request.Active);
-		await _ClientRepository.UpdateByAdminAsync(client);
+		await _ClientRepository.UpdateByAdminAsync(client, cancellationToken);
 		return ClientDto.From(client);
 	}
 }
