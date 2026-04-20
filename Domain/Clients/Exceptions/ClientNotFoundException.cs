@@ -8,4 +8,9 @@ public sealed class ClientNotFoundException : DomainException {
 		: base(HttpStatusCode.NotFound,
 			   "ClientNotFound",
 			   "The client was not found.") { }
+
+	public ClientNotFoundException(int id)
+		: base(HttpStatusCode.NotFound,
+			   "ClientNotFound",
+			   $"Client #{id} not found.") { }
 }
