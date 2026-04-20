@@ -15,20 +15,22 @@ public class ClientRepository : IClientRepository {
 		_Connection = connection;
 	}
 
-	private static void Map(Client obj, ICDataReader rs) {
-		obj.Id = rs.GetValue<int>("id_client");
-		obj.Name = rs.GetValue<string>("name");
-		obj.Lastname = rs.GetValue<string>("lastname");
-		obj.Email = rs.GetValue<string>("email");
-		obj.Phone = rs.GetValue<string?>("phone");
-		obj.PasswordHash = rs.GetValue<string>("password_hash");
-		obj.AddressDeliveryId = rs.GetValue<int?>("address_delivery_id");
-		obj.AddressOrderId = rs.GetValue<int?>("address_order_id");
-		obj.RoleId = rs.GetValue<int>("role_id");
-		obj.RoleName = rs.GetValue<string>("role_name");
-		obj.Active = rs.GetValue<bool>("active");
-		obj.CreationDate = rs.GetValue<DateTime>("creation_date");
-		obj.LogicalDelete = rs.GetValue<bool>("logical_delete");
+	private static Client Map(ICDataReader rs) {
+		return new Client {
+			Id = rs.GetValue<int>("id_client"),
+			Name = rs.GetValue<string>("name"),
+			Lastname = rs.GetValue<string>("lastname"),
+			Email = rs.GetValue<string>("email"),
+			Phone = rs.GetValue<string?>("phone"),
+			PasswordHash = rs.GetValue<string>("password_hash"),
+			AddressDeliveryId = rs.GetValue<int?>("address_delivery_id"),
+			AddressOrderId = rs.GetValue<int?>("address_order_id"),
+			RoleId = rs.GetValue<int>("role_id"),
+			RoleName = rs.GetValue<string>("role_name"),
+			Active = rs.GetValue<bool>("active"),
+			CreationDate = rs.GetValue<DateTime>("creation_date"),
+			LogicalDelete = rs.GetValue<bool>("logical_delete"),
+		};
 	}
 
 	public async Task<PagedData<Client>> GetPagedAsync(int page, int pageSize, string? search, int? roleId, bool? active, CancellationToken cancellationToken) {

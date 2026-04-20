@@ -14,10 +14,12 @@ public class RoleRepository : IRoleRepository {
 		_Connection = connection;
 	}
 
-	private static void Map(Role obj, ICDataReader rs) {
-		obj.Id = rs.GetValue<int>("id");
-		obj.Name = rs.GetValue<string>("name");
-		obj.Description = rs.GetValue<string?>("description");
+	private static Role Map(ICDataReader rs) {
+		return new Role {
+			Id = rs.GetValue<int>("id"),
+			Name = rs.GetValue<string>("name"),
+			Description = rs.GetValue<string?>("description"),
+		};
 	}
 
 	public async Task<List<Role>> GetAllAsync(CancellationToken cancellationToken) {

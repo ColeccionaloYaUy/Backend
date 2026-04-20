@@ -14,16 +14,18 @@ public class AddressRepository : IAddressRepository {
 		_Connection = connection;
 	}
 
-	private static void Map(Address obj, ICDataReader rs) {
-		obj.Id = rs.GetValue<int>("id_address");
-		obj.ClientId = rs.GetValue<int>("id_client");
-		obj.Street = rs.GetValue<string>("street");
-		obj.Number = rs.GetValue<string>("number");
-		obj.City = rs.GetValue<string>("city");
-		obj.Department = rs.GetValue<string>("department");
-		obj.PostalCode = rs.GetValue<string>("postal_code");
-		obj.Type = Enum.Parse<AddressType>(rs.GetValue<string>("type"), ignoreCase: true);
-		obj.LogicalDelete = rs.GetValue<bool>("logical_delete");
+	private static Address Map(ICDataReader rs) {
+		return new Address {
+			Id = rs.GetValue<int>("id_address"),
+			ClientId = rs.GetValue<int>("id_client"),
+			Street = rs.GetValue<string>("street"),
+			Number = rs.GetValue<string>("number"),
+			City = rs.GetValue<string>("city"),
+			Department = rs.GetValue<string>("department"),
+			PostalCode = rs.GetValue<string>("postal_code"),
+			Type = Enum.Parse<AddressType>(rs.GetValue<string>("type"), ignoreCase: true),
+			LogicalDelete = rs.GetValue<bool>("logical_delete"),
+		};
 	}
 
 	public async Task<List<Address>> GetByClientIdAsync(int clientId, CancellationToken cancellationToken) {

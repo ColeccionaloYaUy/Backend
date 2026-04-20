@@ -11,9 +11,9 @@ public interface ICCommand {
 	Task<bool> ExecuteCommandNonQuery(CancellationToken cancellationToken = default);
 
 	Task<T> ExecuteGetValue<T>(string name, CancellationToken cancellationToken = default);
-	Task<T?> ExecuteSelect<T>(Action<T, ICDataReader> loadData, CancellationToken cancellationToken = default) where T : new();
+	Task<T?> ExecuteSelect<T>(Func<ICDataReader, T> map, CancellationToken cancellationToken = default) where T : class;
 
 	Task<ICDataReader> ExecuteReaderAsync(CancellationToken cancellationToken = default);
 
-	Task<List<T>> ExecuteSelectList<T>(Action<T, ICDataReader> loadData, CancellationToken cancellationToken = default) where T : new();
+	Task<List<T>> ExecuteSelectList<T>(Func<ICDataReader, T> map, CancellationToken cancellationToken = default);
 }

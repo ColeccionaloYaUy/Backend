@@ -32,11 +32,11 @@ public class AuthService : IAuthService {
             WHERE c.email = @email AND c.active = TRUE AND c.logical_delete = FALSE";
 		cmd.AddParameter("email", email);
 
-		var user = await cmd.ExecuteSelect<ClientCredentialsRow>((obj, rs) => {
-			obj.Id = rs.GetValue<int>("id_client");
-			obj.Email = rs.GetValue<string>("email");
-			obj.PasswordHash = rs.GetValue<string>("password_hash");
-			obj.RoleName = rs.GetValue<string>("role_name");
+		var user = await cmd.ExecuteSelect<ClientCredentialsRow>(rs => new ClientCredentialsRow {
+			Id = rs.GetValue<int>("id_client"),
+			Email = rs.GetValue<string>("email"),
+			PasswordHash = rs.GetValue<string>("password_hash"),
+			RoleName = rs.GetValue<string>("role_name"),
 		}, cancellationToken);
 
 		if (user == null) throw new InvalidCredentialsException();
@@ -53,9 +53,9 @@ public class AuthService : IAuthService {
 
 		var roleCmd = _Connection.CreateCommand();
 		roleCmd.CommandText = "SELECT id, name FROM roles WHERE name = 'User' LIMIT 1";
-		var role = await roleCmd.ExecuteSelect<RoleRow>((obj, rs) => {
-			obj.Id = rs.GetValue<int>("id");
-			obj.Name = rs.GetValue<string>("name");
+		var role = await roleCmd.ExecuteSelect<RoleRow>(rs => new RoleRow {
+			Id = rs.GetValue<int>("id"),
+			Name = rs.GetValue<string>("name"),
 		}, cancellationToken);
 		if (role == null) throw new DefaultUserRoleNotFoundException();
 
@@ -96,11 +96,11 @@ public class AuthService : IAuthService {
               AND c.logical_delete = FALSE";
 		cmd.AddParameter("token", refreshToken);
 
-		var data = await cmd.ExecuteSelect<RefreshRow>((obj, rs) => {
-			obj.RefreshTokenId = rs.GetValue<int>("id");
-			obj.ClientId = rs.GetValue<int>("id_client");
-			obj.Email = rs.GetValue<string>("email");
-			obj.RoleName = rs.GetValue<string>("role_name");
+		var data = await cmd.ExecuteSelect<RefreshRow>(rs => new RefreshRow {
+			RefreshTokenId = rs.GetValue<int>("id"),
+			ClientId = rs.GetValue<int>("id_client"),
+			Email = rs.GetValue<string>("email"),
+			RoleName = rs.GetValue<string>("role_name"),
 		}, cancellationToken);
 
 		if (data == null) throw new InvalidRefreshTokenException();
@@ -128,9 +128,9 @@ public class AuthService : IAuthService {
             WHERE id_client = @id AND active = TRUE AND logical_delete = FALSE";
 		cmd.AddParameter("id", clientId);
 
-		var row = await cmd.ExecuteSelect<ClientCredentialsRow>((obj, rs) => {
-			obj.Id = rs.GetValue<int>("id_client");
-			obj.PasswordHash = rs.GetValue<string>("password_hash");
+		var row = await cmd.ExecuteSelect<ClientCredentialsRow>(rs => new ClientCredentialsRow {
+			Id = rs.GetValue<int>("id_client"),
+			PasswordHash = rs.GetValue<string>("password_hash"),
 		}, cancellationToken);
 
 		if (row == null) throw new ClientNotFoundException();

@@ -12,17 +12,19 @@ namespace ColeccionaloYa.Persistence.Idempotency.Repository {
         public IdempotencyRepository(ICConnection connection)
             => _connection = connection;
 
-        private static void Map(IdempotencyKey obj, ICDataReader rs) {
-            obj.Id = rs.GetValue<int>("id");
-            obj.Key = rs.GetValue<string>("idempotency_key");
-            obj.ClientId = rs.GetValue<int?>("id_client");
-            obj.Endpoint = rs.GetValue<string>("endpoint");
-            obj.RequestHash = rs.GetValue<string>("request_hash");
-            obj.Status = rs.GetValue<string>("status");
-            obj.StatusCode = rs.GetValue<short?>("status_code");
-            obj.ResponseBody = rs.GetValue<string?>("response_body");
-            obj.CreatedAt = rs.GetValue<DateTime>("created_at");
-            obj.ExpiresAt = rs.GetValue<DateTime>("expires_at");
+        private static IdempotencyKey Map(ICDataReader rs) {
+            return new IdempotencyKey {
+                Id = rs.GetValue<int>("id"),
+                Key = rs.GetValue<string>("idempotency_key"),
+                ClientId = rs.GetValue<int?>("id_client"),
+                Endpoint = rs.GetValue<string>("endpoint"),
+                RequestHash = rs.GetValue<string>("request_hash"),
+                Status = rs.GetValue<string>("status"),
+                StatusCode = rs.GetValue<short?>("status_code"),
+                ResponseBody = rs.GetValue<string?>("response_body"),
+                CreatedAt = rs.GetValue<DateTime>("created_at"),
+                ExpiresAt = rs.GetValue<DateTime>("expires_at"),
+            };
         }
 
         public async Task<IdempotencyKey?> TryInsertAsync(

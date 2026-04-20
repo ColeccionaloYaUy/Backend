@@ -69,28 +69,23 @@ public class CCommand : ICCommand {
 		return default!;
 	}
 
-	public async Task<T?> ExecuteSelect<T>(Action<T, ICDataReader> loadData, CancellationToken cancellationToken = default) where T : new() {
+	public async Task<T?> ExecuteSelect<T>(Func<ICDataReader, T> map, CancellationToken cancellationToken = default) where T : class {
 		await using var rs = await ExecuteReaderAsync(cancellationToken);
 
 		if (await rs.ReadAsync(cancellationToken)) {
-			var result = new T();
-			loadData.Invoke(result, rs);
-			return result;
+			return map(rs);
 		}
 
-		return default;
+		return null;
 	}
 
-	public async Task<List<T>> ExecuteSelectList<T>(Action<T, ICDataReader> loadData, CancellationToken cancellationToken = default) where T : new() {
+	public async Task<List<T>> ExecuteSelectList<T>(Func<ICDataReader, T> map, CancellationToken cancellationToken = default) {
 		var result = new List<T>();
 
 		await using var rs = await ExecuteReaderAsync(cancellationToken);
 
 		while (await rs.ReadAsync(cancellationToken)) {
-			T obj = new();
-			loadData.Invoke(obj, rs);
-
-			result.Add(obj);
+			result.Add(map(rs));
 		}
 
 		return result;
