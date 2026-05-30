@@ -14,6 +14,8 @@ public static class ApplicationConfiguration {
         app.UseResponseCompression();
         app.UseRateLimiter();
 
+        app.UseStaticFiles();
+
         //app.UseMiddleware<SecurityHeadersMiddleware>();
 
         app.UseMiddleware<ExceptionMiddleware>();
