@@ -20,17 +20,17 @@ public class UploadController : ControllerBase {
 
 	[HttpPost("image")]
 	[Consumes("multipart/form-data")]
-	public async Task<IActionResult> UploadImage([FromForm] IFormFile file, CancellationToken cancellationToken) {
-		var bytes = await ReadBytes(file, cancellationToken);
-		var result = await _Mediator.Send(new UploadImageCommand(bytes, file.FileName), cancellationToken);
+	public async Task<IActionResult> UploadImage([FromForm] UploadImageForm form, CancellationToken cancellationToken) {
+		var bytes = await ReadBytes(form.File, cancellationToken);
+		var result = await _Mediator.Send(new UploadImageCommand(bytes, form.File.FileName), cancellationToken);
 		return StatusCode(StatusCodes.Status201Created, result);
 	}
 
 	[HttpPost("images")]
 	[Consumes("multipart/form-data")]
-	public async Task<IActionResult> UploadImages([FromForm] List<IFormFile> files, CancellationToken cancellationToken) {
+	public async Task<IActionResult> UploadImages([FromForm] UploadImagesForm form, CancellationToken cancellationToken) {
 		var items = new List<UploadFileItem>();
-		foreach (var file in files) {
+		foreach (var file in form.Files) {
 			var bytes = await ReadBytes(file, cancellationToken);
 			items.Add(new UploadFileItem(bytes, file.FileName));
 		}

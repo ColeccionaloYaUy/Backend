@@ -24,22 +24,17 @@ public class ProductGalleryController : ControllerBase {
 	[HttpPost]
 	[Authorize(Roles = "Admin")]
 	[Consumes("multipart/form-data")]
-	public async Task<IActionResult> Add(
-		int id,
-		[FromForm] IFormFile? file,
-		[FromForm] string? url,
-		[FromForm] int? order,
-		CancellationToken cancellationToken) {
+	public async Task<IActionResult> Add(int id, [FromForm] AddGalleryImageForm form, CancellationToken cancellationToken) {
 		byte[]? bytes = null;
 		string? fileName = null;
-		if (file is not null) {
+		if (form.File is not null) {
 			using var ms = new MemoryStream();
-			await file.CopyToAsync(ms, cancellationToken);
+			await form.File.CopyToAsync(ms, cancellationToken);
 			bytes = ms.ToArray();
-			fileName = file.FileName;
+			fileName = form.File.FileName;
 		}
 
-		var image = await _Mediator.Send(new AddGalleryImageCommand(id, bytes, fileName, url, order), cancellationToken);
+		var image = await _Mediator.Send(new AddGalleryImageCommand(id, bytes, fileName, form.Url, form.Order), cancellationToken);
 		return CreatedAtAction(nameof(GetAll), new { id }, image);
 	}
 
